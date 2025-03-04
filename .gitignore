@@ -1,0 +1,36 @@
+# 🏗️ Build & Dépendances
+node_modules/
+.next/
+out/
+dist/
+.cache/
+
+# 📦 Fichiers de configuration & logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.dockerignore
+package-lock.json
+
+# 🚀 Fichiers Docker
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# 🔍 Éditeurs & IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-workspace
+
+# 🐳 Docker
+docker-compose.override.yml
+
+# ⚡️ Next.js Specific
+.vercel/
+.vscode/

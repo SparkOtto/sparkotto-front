@@ -1,0 +1,26 @@
+{
+  "name": "sparkotto-front",
+  "version": "1.0.0",
+  "description": "package json front",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SparkOtto/sparkotto-front.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SparkOtto/sparkotto-front/issues"
+  },
+  "homepage": "https://github.com/SparkOtto/sparkotto-front#readme",
+  "dependencies": {
+    "next": "^15.2.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}
