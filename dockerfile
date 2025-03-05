@@ -1,5 +1,5 @@
 # Étape 1 : Build de l'application Next.js
-FROM node:18 AS build
+FROM node:lts-alpine AS build
 
 WORKDIR /app
 
@@ -11,7 +11,7 @@ COPY . .
 RUN npm run build
 
 # Étape 2 : Exécution en production
-FROM node:18
+FROM node:lts-alpine
 
 WORKDIR /app
 
