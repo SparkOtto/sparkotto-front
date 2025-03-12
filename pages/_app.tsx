@@ -1,4 +1,4 @@
-import '../styles/custom-bootstrap.scss';
+import '../public/assets/scss/global.scss';
 import App, { AppProps } from 'next/app';
 
 function SparkOtto({ Component, pageProps }: AppProps) {
