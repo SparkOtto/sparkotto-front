@@ -4,7 +4,7 @@ import Form from 'react-bootstrap/Form';
 
 export default function AuthForm() {
   return (
-    <Form>
+    <Form className="bg-white p-5 rounded">
       <Form.Group className="mb-3" controlId="formBasicEmail">
         <Form.Label>Email address</Form.Label>
         <Form.Control type="email" placeholder="Enter email" />
@@ -20,7 +20,7 @@ export default function AuthForm() {
       <Form.Group className="mb-3" controlId="formBasicCheckbox">
         <Form.Check type="checkbox" label="Check me out" />
       </Form.Group>
-      <Button variant="primary" type="submit">
+      <Button variant="yellow" className='bg-yellow' type="submit">
         Submit
       </Button>
     </Form>

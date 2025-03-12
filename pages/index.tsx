@@ -1,13 +1,13 @@
 import React from 'react';
-import Layout from '../components/Layout';
+import AuthForm from '../components/AuthForm';
+import AuthLayout from '../components/AuthLayout';
 
 export default function Page() {
     return (
         <>
-            <Layout>
-                <h1>Home</h1>
-                <p>This is the home page.</p>
-            </Layout>
+            <AuthLayout>
+                <AuthForm />
+            </AuthLayout>
         </>
     )
   }
