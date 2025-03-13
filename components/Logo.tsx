@@ -6,7 +6,7 @@ import SparkLogo from '../public/images/logo.jpg';
 
 export default function Logo() {
     return (
-        <Image src={ SparkLogo } alt="Logo" className='w-70 h-20' />
+        <Image src={ SparkLogo } alt="Logo" className='logo' />
     );
   }
   
