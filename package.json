@@ -19,6 +19,9 @@
   },
   "homepage": "https://github.com/SparkOtto/sparkotto-front#readme",
   "dependencies": {
+    "@fullcalendar/core": "^6.1.15",
+    "@fullcalendar/daygrid": "^6.1.15",
+    "@fullcalendar/react": "^6.1.15",
     "bootstrap": "^5.3.3",
     "next": "^15.2.1",
     "react": "^19.0.0",
