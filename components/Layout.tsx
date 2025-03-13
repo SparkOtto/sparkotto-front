@@ -7,11 +7,11 @@ import { Col, Container, Row } from 'react-bootstrap';
 export default function Layout({ children }) {
     return (
         <>
-        <Row>
-            <Col md={4} xl={2} xxl={2}>
+        <Row className="mx-0">
+            <Col md={4} xl={2} xxl={2} className="px-0">
                 <Navbar />
             </Col>
-            <Col  md={8} xl={10} xxl={10}>
+            <Col md={8} xl={10} xxl={10} className="px-0">
                 <Container>
                     {children}
                 </Container>
