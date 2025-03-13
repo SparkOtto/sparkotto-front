@@ -1,6 +1,7 @@
 import React from 'react';
 import { Form, Button, Tab, Tabs, Row, Col } from 'react-bootstrap';
 import Logo from './Logo';
+import Link from 'next/link';
 
 export default function AuthForm() {
   return (
@@ -22,9 +23,9 @@ export default function AuthForm() {
               </Form.Group>
               <Form.Group className="mb-3 d-flex justify-content-between align-items-center">
                 <Form.Check type="checkbox" label="Rester connecté" />
-                <a href="#" className="text-muted">Mot de passe oublié ?</a>
+                <Link href="/auth/forgot-password" className="text-muted">Mot de passe oublié ?</Link>
               </Form.Group>
-              <Button variant="yellow" className="w-100 bg-yellow border-0 fw-bold">
+              <Button variant="yellow" className="w-100 bg-yellow border-0 fw-bold mt-2">
                 Connexion
               </Button>
             </Form>
@@ -66,7 +67,7 @@ export default function AuthForm() {
                   <Form.Control type="password" placeholder="Mot de passe" />
                 </Form.Group>
 
-                <Button variant="yellow" className="w-100 bg-yellow border-0 fw-bold">
+                <Button variant="yellow" className="w-100 bg-yellow border-0 fw-bold mt-3">
                   Inscription
                 </Button>
             </Form>

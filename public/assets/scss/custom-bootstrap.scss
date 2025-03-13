@@ -1,27 +1,16 @@
-// Logo
-.logo {
-    width: 25.0em;
-    height: 10.5em;
-}
-
-// .authForm
-.authForm {
-    max-width: 40.0em;
-    width: 40.0em;
-
-}
-
-// Définissez votre couleur personnalisée
+// Couleur personnalisée
 $purple: #68308E;
 $yellow: #FCCC2E;
 
-// Ajoutez votre couleur personnalisée à la map des thèmes
+// Ajout des couleurs personnalisée à la map des thèmes
 $theme-colors: (
     "purple": $purple,
     "yellow": $yellow
 );
 
+// Customisation des classes de largeur et de hauteur
 $widths: (
+    5: 5%,
     10: 10%,
     20: 20%,
     30: 30%,
@@ -35,6 +24,7 @@ $widths: (
 );
 
 $heights: (
+    5: 5%,
     10: 10%,
     20: 20%,
     30: 30%,
@@ -69,3 +59,84 @@ $heights: (
 // Ajoutez vos classes de largeur et de hauteur personnalisées
 @include generate-width-classes;
 @include generate-height-classes;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+// Logo
+.logo {
+  width: 25.0em;
+  height: 10.5em;
+}
+
+// .authForm
+.authForm {
+  max-width: 35.0em;
+  width: 35.0em;
+
+}
+
+// full responsive media queries for logo
+
+.logo {
+  /* Dimensions par défaut (pour écrans > 1920px) */
+  width: 25em;
+  height: 5.5em;
+  object-fit: contain;
+}
+
+@media (max-width: 1920px) {
+  .logo {
+    width: 22em;
+    height: 4.8em; /* Ratio conservé 22/4.8 ≈ 4.58 */
+  }
+}
+
+@media (max-width: 1600px) {
+  .logo {
+    width: 20em;
+    height: 4.4em; /* Ratio ≈ 4.55 */
+  }
+}
+
+@media (max-width: 1400px) {
+  .logo {
+    /* Dimensions idéales spécifiées */
+    width: 18em;
+    height: 4em; /* Ratio 4.5 */
+  }
+}
+
+@media (max-width: 1200px) {
+  .logo {
+    width: 16em;
+    height: 3.5em; /* Ratio ≈ 4.57 */
+  }
+}
+
+@media (max-width: 992px) {
+  .logo {
+    width: 14em;
+    height: 3.1em; /* Ratio ≈ 4.52 */
+  }
+}
+
+@media (max-width: 768px) {
+  .logo {
+    width: 12em;
+    height: 2.6em; /* Ratio ≈ 4.61 */
+  }
+}
+
+@media (max-width: 576px) {
+  .logo {
+    width: 10em;
+    height: 2.2em; /* Ratio ≈ 4.54 */
+  }
+}
+
+
+
