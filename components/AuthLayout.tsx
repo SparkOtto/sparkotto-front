@@ -1,6 +1,5 @@
 import React from 'react';
 import Footer from './Footer';
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 export default function AuthLayout({ children }) {

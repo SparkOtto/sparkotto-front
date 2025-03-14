@@ -18,13 +18,13 @@ export default function Sidebar() {
         <Logo />
       </div>
       <Nav className="flex-column">
-        <Button variant="warning" className="mb-3 bg-yellow text-dark fw-bold">
+        <Button variant="yellow" className="mb-3 text-dark">
           Réserver un Véhicule
         </Button>
-        <Button variant="warning" className="mb-3 bg-yellow text-dark fw-bold">
+        <Button variant="yellow" className="mb-3 text-dark">
           Ajouter un véhicule
         </Button>
-        <Button variant="warning" className="mb-3 bg-yellow text-dark fw-bold">
+        <Button variant="yellow" className="mb-3 text-dark">
           Mes trajets à venir
         </Button>
       </Nav>

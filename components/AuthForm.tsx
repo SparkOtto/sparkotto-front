@@ -1,5 +1,10 @@
-import React from 'react';
-import { Form, Button, Tab, Tabs, Row, Col } from 'react-bootstrap';
+import React, { useState } from 'react';
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
+import Tab from 'react-bootstrap/Tab';
+import Tabs from 'react-bootstrap/Tabs';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 import Logo from './Logo';
 import Link from 'next/link';
 
@@ -25,7 +30,7 @@ export default function AuthForm() {
                 <Form.Check type="checkbox" label="Rester connecté" />
                 <Link href="/auth/forgot-password" className="text-muted">Mot de passe oublié ?</Link>
               </Form.Group>
-              <Button variant="yellow" className="w-100 bg-yellow border-0 fw-bold mt-2">
+              <Button variant="yellow" className="w-100 border-0 fw-bold mt-2">
                 Connexion
               </Button>
             </Form>

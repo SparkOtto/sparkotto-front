@@ -1,7 +1,7 @@
 import React from 'react';
 import Navbar from './Navbar';
-import Footer from './Footer';
 import { Col, Container, Row } from 'react-bootstrap';
+import HeaderNavbar from './HeaderNavbar';
 
 
 export default function Layout({ children }) {
@@ -12,6 +12,7 @@ export default function Layout({ children }) {
                 <Navbar />
             </Col>
             <Col md={8} xl={10} xxl={10} className="px-0">
+                <HeaderNavbar />
                 <Container>
                     {children}
                 </Container>

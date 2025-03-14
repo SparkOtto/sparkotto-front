@@ -8,23 +8,27 @@ export default function Page() {
     return (
         <Layout>
             <div className="container py-4">
-                {/* Barre de recherche */}
-                <Form className="mb-4">
-                    <Form.Control type="text" placeholder="Rechercher" className="p-2" />
-                </Form>
-                
                 {/* Section Mes trajets à venir */}
-                <div className="bg-light p-4 rounded">
-                    <h4 className="mb-3">Mes trajets à venir :</h4>
+                <div className="py-4 px-4 rounded bg-lightgray">
+                    <h4 className="mb-4">Mes trajets à venir :</h4>
                     <Row className="d-flex flex-wrap gap-2 justify-content-between">
                         {["Clio IV", "Zoe", "Peugeot"].map((car, index) => (
                             <Col>
                                 <Card key={index} className="p-3">
                                     <Card.Body>
-                                        <Card.Title>{car}</Card.Title>
-                                        <Card.Text>📍 Rennes</Card.Text>
-                                        <Card.Text>👤 John Doe</Card.Text>
-                                        <Card.Text>Le 12/12/2021</Card.Text>
+                                        <Card.Title className='mb-3'>{car}</Card.Title>
+                                        <div className='w-100 py-2 px-5 my-0 mb-3 d-flex items-content-center justify-content-between' >
+                                            <div>
+                                                <Card.Text>📍 Rennes</Card.Text>
+                                                <Card.Text>👤 John Doe</Card.Text>
+                                                <Card.Text>Le 12/12/2021</Card.Text>
+                                            </div>
+                                            <div>
+                                                <Card.Text>Libre</Card.Text>
+                                                <Card.Text>Libre</Card.Text>
+                                                <Card.Text>Libre</Card.Text>
+                                            </div>
+                                        </div>
                                         <Button variant="yellow" className="w-100">Voir le trajet</Button>
                                     </Card.Body>
                                 </Card>
@@ -34,7 +38,7 @@ export default function Page() {
                 </div>
                 
                 {/* Section Trouver une voiture */}
-                <div className="mt-4 w5">
+                <div className="mt-5 w5">
                     <h4 className="mb-3">Trouver une voiture</h4>
                     <FullCalendar
                         plugins={[ dayGridPlugin ]}
