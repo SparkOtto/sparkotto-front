@@ -44,7 +44,7 @@ export default function Page() {
                         plugins={[ dayGridPlugin ]}
                         initialView="dayGridMonth"
                         weekends={false}
-                        height="auto"
+                        height={'auto'}
                         events={[
                             { title: 'Réservation Clio IV', date: '2025-03-13' },
                             { title: 'Réservation Zoe', date: '2025-03-14' }
