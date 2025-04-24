@@ -4,7 +4,7 @@ import { Card, Button, Form, Row, Col } from 'react-bootstrap';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid'
 
-export default function Page() {
+export default function Dashboard() {
     return (
         <Layout>
             <div className="container py-4">
