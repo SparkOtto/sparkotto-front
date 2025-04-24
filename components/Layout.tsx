@@ -13,7 +13,7 @@ export default function Layout({ children }) {
             </Col>
             <Col md={12} lg={9} xl={9} xxl={9} className="px-0">
                 <HeaderNavbar />
-                <Container>
+                <Container fluid>
                     {children}
                 </Container>
             </Col>

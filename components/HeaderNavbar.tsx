@@ -23,7 +23,7 @@ export default function CustomNavbar() {
                 <FaBell size={20} />
               </Col>
               <Col xs="auto">
-                <div className="d-flex align-items-center justify-content-between gap-4 bg-black px-4 py-3 rounded-pill text-white">
+                <div className="d-flex align-items-center justify-content-between gap-4 bg-black px-3 py-3 rounded-pill text-white">
                   <Image src={SparkLogo} alt="User" width={40} height={40} className="rounded-circle" />
                   <span className="d-none d-xl-inline">John Doe</span>
                 </div>
