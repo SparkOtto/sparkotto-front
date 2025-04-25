@@ -6,6 +6,7 @@ export function middleware(request: NextRequest) {
 
     const protectedRoutes: { [key: string]: string[] } = {
         '/dashboard': ['user', 'admin'],
+        '/admin/user': ['user', 'admin'],
     };
 
     const isProtectedRoute = Object.keys(protectedRoutes).some((route) => pathname.startsWith(route));
@@ -49,6 +50,7 @@ export function middleware(request: NextRequest) {
 export const config = {
     matcher: [
         '/', 
-        '/dashboard'
+        '/dashboard',
+        '/admin/user'
     ], 
 };
