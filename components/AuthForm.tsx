@@ -53,9 +53,11 @@ export default function AuthForm() {
         Cookies.set('token', token, { expires: 7, secure: true });
         Cookies.set('user', JSON.stringify(user), { expires: 7 });
 
-        console.log(Cookies.get('user'));
+        toast.success('Connexion réussie!');
 
         router.push('/dashboard');
+
+        toast.success('Connexion réussie!');
       }
 
     } catch (error) {
@@ -72,7 +74,7 @@ export default function AuthForm() {
     const password = (event.target as any).formBasicPassword.value;
 
     try {
-      const response = await fetch('http://192.168.167.89:3001/api/auth/register', {
+      const response = await fetch(`http://192.168.167.89:3001/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
