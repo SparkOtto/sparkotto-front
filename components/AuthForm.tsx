@@ -11,7 +11,6 @@ import Logo from './Logo';
 import Link from 'next/link';
 import { ToastContainer, toast } from 'react-toastify';
 import { useRouter } from 'next/router';
-import { useNavigation } from '../services/navigation';
 import Cookies from 'js-cookie'
 
 
@@ -23,8 +22,6 @@ export default function AuthForm() {
 
     const email = (event.target as any).formBasicEmail.value;
     const password = (event.target as any).formBasicPassword.value;
-
-    const cookieStore = require('js-cookie');
 
     try {
       const response = await fetch('http://192.168.167.89:3001/api/auth/login', {
