@@ -46,10 +46,14 @@ export default function Page() {
                                     <span className="d-lg-inline d-none">Filtre</span>
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
+                                    <Dropdown.Item href="#">Alphabétique A-Z</Dropdown.Item>
+                                    <Dropdown.Item href="#">Alphabétique Z-A</Dropdown.Item>
+                                    <Dropdown.Divider />
                                     <Dropdown.Item href="#">Actifs</Dropdown.Item>
                                     <Dropdown.Item href="#">Inactifs</Dropdown.Item>
-                                    <Dropdown.Item href="#">Administrateurs</Dropdown.Item>
-                                    <Dropdown.Item href="#">Utilisateurs</Dropdown.Item>
+                                    <Dropdown.Divider />
+                                    <Dropdown.Item href="#">Inscription valider</Dropdown.Item>
+                                    <Dropdown.Item href="#">Inscription en attente de validation</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
                             <Button variant="black" className="mb-2 mb-md-0">
@@ -85,9 +89,13 @@ export default function Page() {
                                                         <FaAlignJustify className="me-2 w-60 h-60" />
                                                     </Dropdown.Toggle>
                                                     <Dropdown.Menu>
+                                                        <Dropdown.Item href="#">Valider l'inscription</Dropdown.Item>
+                                                        <Dropdown.Divider />
+                                                        <Dropdown.Item href="#">Désactiver</Dropdown.Item>
+                                                        <Dropdown.Divider />
                                                         <Dropdown.Item href="#">Modifier</Dropdown.Item>
                                                         <Dropdown.Item href="#">Supprimer</Dropdown.Item>
-                                                        <Dropdown.Item href="#">Désactiver</Dropdown.Item>
+                                                        <Dropdown.Item href="#">Réinitialiser le mot de passe</Dropdown.Item>
                                                     </Dropdown.Menu>
                                                 </Dropdown>
                                             </Col>
