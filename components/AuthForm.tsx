@@ -24,7 +24,7 @@ export default function AuthForm() {
     const password = (event.target as any).formBasicPassword.value;
 
     try {
-      const response = await fetch('http://192.168.167.89:3001/api/auth/login', {
+      const response = await fetch(`${process.env.backendAPI}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -39,6 +39,11 @@ export default function AuthForm() {
         const data = await response.json();
 
         if(response.status === 500){
+          toast.error(data.message);
+          // toast.error('Erreur serveur, veuillez réessayer plus tard.');
+          return;
+        }
+        if(response.status === 401){
           toast.error(data.message);
           return;
         }
@@ -71,7 +76,7 @@ export default function AuthForm() {
     const password = (event.target as any).formBasicPassword.value;
 
     try {
-      const response = await fetch(`http://192.168.167.89:3001/api/auth/register`, {
+      const response = await fetch(`${process.env.backendAPI}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

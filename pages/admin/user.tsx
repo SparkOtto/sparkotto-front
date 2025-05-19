@@ -7,7 +7,7 @@ import { FaArrowsRotate, FaFilter, FaPlus, FaAlignJustify } from "react-icons/fa
 export default function Page() {
     const getAllUser = async () => {
         try {
-            const response = await fetch('http://192.168.167.89:3001/api/user', {
+            const response = await fetch(`${process.env.backendAPI}/api/user`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
