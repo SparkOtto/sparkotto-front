@@ -40,7 +40,6 @@ export default function AuthForm() {
 
         if(response.status === 500){
           toast.error(data.message);
-          // toast.error('Erreur serveur, veuillez réessayer plus tard.');
           return;
         }
         if(response.status === 401){
@@ -58,8 +57,6 @@ export default function AuthForm() {
         toast.success('Connexion réussie!');
 
         router.push('/dashboard');
-
-        toast.success('Connexion réussie!');
       }
 
     } catch (error) {

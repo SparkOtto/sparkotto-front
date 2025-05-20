@@ -116,6 +116,10 @@ $heights: (
   object-fit: contain;
 }
 
+.cursor-pointer {
+  cursor: pointer;
+}
+
 @media (max-width: 1920px) {
   .logo {
     width: 22em;

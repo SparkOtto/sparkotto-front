@@ -5,6 +5,7 @@ import Offcanvas from 'react-bootstrap/Offcanvas';
 import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
 import Logo from './Logo';
+import Link from 'next/link';
 
 export default function Sidebar() {
   const [show, setShow] = useState(false);
@@ -15,7 +16,9 @@ export default function Sidebar() {
   const SidebarContent = () => (
     <>
       <div className="text-center mb-4">
-        <Logo />
+        <Link href="/" className="text-decoration-none text-white">
+            <Logo />
+        </Link>
       </div>
       <Nav className="flex-column">
         <Button variant="yellow" className="mb-3 text-dark">
@@ -40,7 +43,11 @@ export default function Sidebar() {
     <>
       <Navbar bg="purple" expand={false} className="mb-3 d-lg-none">
         <Container fluid>
-          <Navbar.Brand href="#"><Logo /></Navbar.Brand>
+          <Navbar.Brand>
+            <Link href="/" className="text-decoration-none text-white">
+              <Logo />
+            </Link>
+          </Navbar.Brand>
           <Navbar.Toggle aria-controls="offcanvasNavbar" onClick={handleShow} className="bg-yellow" />
           <Navbar.Offcanvas
             id="offcanvasNavbar"
