@@ -3,11 +3,16 @@ import Layout from '../../components/Layout';
 import { Card, Button, Form, Row, Col, Modal } from 'react-bootstrap';
 import Cookies from 'js-cookie';
 import { ToastContainer, toast } from 'react-toastify';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 export default function Profile() {
     const [user, setUser] = useState({ first_name: '', last_name: '', email: '', phone_number: '', id: '' });
     const [isEditing, setIsEditing] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const currentPasswordRef = useRef<HTMLInputElement>(null);
     const newPasswordRef = useRef<HTMLInputElement>(null);
@@ -40,9 +45,9 @@ export default function Profile() {
                 const response = await fetch(`${process.env.backendAPI}/api/user/change-password/${user.id}`, {
                     method: 'POST',
                     headers: {
-                    'Content-Type': 'application/json',
+                        'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ oldPassword: currentPassword, newPassword: newPassword }),
+                    body: JSON.stringify({ oldPassword: currentPassword, newPassword: newPassword, confirmPassword: confirmPassword }),
                 });
 
                 if (!response.ok) {
@@ -53,8 +58,11 @@ export default function Profile() {
                     }
                     throw new Error(data.message);
                 }
-            } catch (error) {
 
+                const data = await response.json();
+                toast.success(data.message);
+
+            } catch (error) {
                 toast.error(`${error}`);
             }
         };
@@ -146,26 +154,61 @@ export default function Profile() {
                 </Card>
 
                 {/* Encars de changement de mot de passe */}
-
                 <Card className="p-4 mb-4">
                     <Card.Body>
                         <h5>Changer le mot de passe</h5>
                         <Form>
                             <Form.Group controlId="current_password" className="mb-3">
                                 <Form.Label>Mot de passe actuel</Form.Label>
-                                <Form.Control type="password" ref={currentPasswordRef} />
+                                <div className="position-relative">
+                                    <Form.Control
+                                        type={showCurrentPassword ? 'text' : 'password'}
+                                        ref={currentPasswordRef}
+                                    />
+                                    <Button
+                                        variant="link"
+                                        className="position-absolute top-50 end-0 translate-middle-y"
+                                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                                    >
+                                        {showCurrentPassword ? <FaEyeSlash /> : <FaEye />}
+                                    </Button>
+                                </div>
                             </Form.Group>
                             <Row>
                                 <Col md={6}>
                                     <Form.Group controlId="new_password" className="mb-3">
                                         <Form.Label>Nouveau mot de passe</Form.Label>
-                                        <Form.Control type="password" ref={newPasswordRef} />
+                                        <div className="position-relative">
+                                            <Form.Control
+                                                type={showNewPassword ? 'text' : 'password'}
+                                                ref={newPasswordRef}
+                                            />
+                                            <Button
+                                                variant="link"
+                                                className="position-absolute top-50 end-0 translate-middle-y"
+                                                onClick={() => setShowNewPassword(!showNewPassword)}
+                                            >
+                                                {showNewPassword ? <FaEyeSlash /> : <FaEye />}
+                                            </Button>
+                                        </div>
                                     </Form.Group>
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group controlId="confirm_password" className="mb-3">
                                         <Form.Label>Confirmer le nouveau mot de passe</Form.Label>
-                                        <Form.Control type="password" ref={confirmPasswordRef} />
+                                        <div className="position-relative">
+                                            <Form.Control
+                                                type={showConfirmPassword ? 'text' : 'password'}
+                                                ref={confirmPasswordRef}
+                                            />
+                                            <Button
+                                                variant="link"
+                                                className="position-absolute top-50 end-0 translate-middle-y"
+                                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                            >
+                                                {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                                            </Button>
+                                        </div>
                                     </Form.Group>
                                 </Col>
                             </Row>
@@ -209,7 +252,6 @@ export default function Profile() {
                         </Button>
                     </Modal.Footer>
                 </Modal>
-
             </div>
         </Layout>
     );

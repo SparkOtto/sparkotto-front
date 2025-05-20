@@ -35,14 +35,11 @@ export default function Sidebar() {
           </>
         ) : (
           <>
-            <Button variant="yellow" className="mb-3 text-dark">
-              Réserver un Véhicule
-            </Button>
-            <Button variant="yellow" className="mb-3 text-dark">
-              Ajouter un véhicule
-            </Button>
-            <Button variant="yellow" className="mb-3 text-dark">
+            <Button variant="yellow" className="mb-3 text-dark" onClick={() => router.push('/dashboard')}>
               Mes trajets à venir
+            </Button>
+            <Button variant="yellow" className="mb-3 text-dark" onClick={() => router.push('/resa')}>
+              Réserver un Véhicule
             </Button>
           </>
         )}
