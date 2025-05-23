@@ -29,7 +29,7 @@ export default function Sidebar() {
             <Button variant="yellow" className="mb-3 text-dark" onClick={() => router.push('/admin/user')}>
               Gérer les utilisateurs
             </Button>
-            <Button variant="yellow" className="mb-3 text-dark" onClick={() => router.push('/admin/car')}>
+            <Button variant="yellow" className="mb-3 text-dark" onClick={() => router.push('/admin/vehicle')}>
               Gérer les véhicules
             </Button>
           </>
