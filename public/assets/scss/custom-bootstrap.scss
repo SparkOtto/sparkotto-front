@@ -157,6 +157,11 @@ $heights: (
   background: #d4d4d5;
 }
 
+.sparkotto-table tbody tr:hover {
+  background: #c4c4c5;
+  transition: background-color 0.3s ease;
+}
+
 .sparkotto-table tbody td {
   padding: 20px 14px;
   border: none;

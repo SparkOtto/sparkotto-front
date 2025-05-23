@@ -8,7 +8,6 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 export default function Profile() {
     const [user, setUser] = useState({ first_name: '', last_name: '', email: '', phone_number: '', id: '' });
     const [isEditing, setIsEditing] = useState(false);
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
 
     const [showCurrentPassword, setShowCurrentPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
@@ -18,12 +17,58 @@ export default function Profile() {
     const newPasswordRef = useRef<HTMLInputElement>(null);
     const confirmPasswordRef = useRef<HTMLInputElement>(null);
 
+    const firstNameRef = useRef<HTMLInputElement>(null);
+    const lastNameRef = useRef<HTMLInputElement>(null);
+    const emailRef = useRef<HTMLInputElement>(null);
+    const phoneRef = useRef<HTMLInputElement>(null);
+
     useEffect(() => {
         const userCookie = Cookies.get('user');
         if (userCookie) {
             setUser(JSON.parse(userCookie));
         }
     }, []);
+
+
+    const handleSaveProfile = () => {
+        const firstName = firstNameRef.current?.value;
+        const lastName = lastNameRef.current?.value;
+        const email = emailRef.current?.value;
+        const phoneNumber = phoneRef.current?.value;
+
+        if (!firstName || !lastName || !email || !phoneNumber) {
+            toast.error('Veuillez remplir tous les champs.');
+            return;
+        }
+
+        const updateProfile = async () => {
+            try {
+                const response = await fetch(`${process.env.backendAPI}/api/user/${user.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ first_name: firstName, last_name: lastName, email: email, phone_number: phoneNumber }),
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erreur lors de la mise à jour du profil.');
+                }
+
+                const data = await response.json();
+                toast.success('Profil mis à jour avec succès.');
+                setUser({ ...user, first_name: firstName, last_name: lastName, email: email, phone_number: phoneNumber });
+                Cookies.set('user', JSON.stringify({ ...user, first_name: firstName, last_name: lastName, email: email, phone_number: phoneNumber }), { expires: 1 });
+                setIsEditing(false);
+
+            } catch (error) {
+                toast.error(`${error}`);
+            }
+        };
+
+        updateProfile();
+    };
+
 
     const handleSavePassword = () => {
         const currentPassword = currentPasswordRef.current?.value;
@@ -84,8 +129,8 @@ export default function Profile() {
                                         <Form.Control
                                             type="text"
                                             name="first_name"
-                                            value={user.first_name}
-                                            onChange={(e) => setUser({ ...user, first_name: e.target.value })}
+                                            defaultValue={user.first_name}
+                                            ref={firstNameRef}
                                             disabled={!isEditing}
                                         />
                                     </Form.Group>
@@ -96,8 +141,8 @@ export default function Profile() {
                                         <Form.Control
                                             type="text"
                                             name="last_name"
-                                            value={user.last_name}
-                                            onChange={(e) => setUser({ ...user, last_name: e.target.value })}
+                                            defaultValue={user.last_name}
+                                            ref={lastNameRef}
                                             disabled={!isEditing}
                                         />
                                     </Form.Group>
@@ -110,8 +155,8 @@ export default function Profile() {
                                         <Form.Control
                                             type="email"
                                             name="email"
-                                            value={user.email}
-                                            onChange={(e) => setUser({ ...user, email: e.target.value })}
+                                            defaultValue={user.email}
+                                            ref={emailRef}
                                             disabled={!isEditing}
                                         />
                                     </Form.Group>
@@ -122,8 +167,8 @@ export default function Profile() {
                                         <Form.Control
                                             type="text"
                                             name="phone_number"
-                                            value={user.phone_number}
-                                            onChange={(e) => setUser({ ...user, phone_number: e.target.value })}
+                                            defaultValue={user.phone_number}
+                                            ref={phoneRef}
                                             disabled={!isEditing}
                                         />
                                     </Form.Group>
@@ -139,7 +184,7 @@ export default function Profile() {
                                         >
                                             Annuler
                                         </Button>
-                                        <Button variant="yellow" onClick={() => setIsEditing(false)}>
+                                        <Button variant="yellow" onClick={() => handleSaveProfile()}>
                                             Enregistrer
                                         </Button>
                                     </>
@@ -220,38 +265,6 @@ export default function Profile() {
                         </div>
                     </Card.Body>
                 </Card>
-
-                {/* Gestion de profil */}
-                <Card className="p-4">
-                    <Card.Body>
-                        <h5>Gestion de profil</h5>
-                        <Button
-                            variant="danger"
-                            className="mt-3"
-                            onClick={() => setShowDeleteModal(true)}
-                        >
-                            Supprimer mon compte
-                        </Button>
-                    </Card.Body>
-                </Card>
-
-                {/* Modal de confirmation de suppression */}
-                <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
-                    <Modal.Header closeButton>
-                        <Modal.Title>Confirmer la suppression</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-                            Annuler
-                        </Button>
-                        <Button variant="danger" onClick={() => setShowDeleteModal(false)}>
-                            Supprimer
-                        </Button>
-                    </Modal.Footer>
-                </Modal>
             </div>
         </Layout>
     );

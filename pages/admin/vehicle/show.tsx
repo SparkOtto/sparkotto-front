@@ -1,24 +1,29 @@
 import React, { useState } from 'react';
-import Layout from '../../components/Layout';
+import Layout from '../../../components/Layout';
 import { Card, Button, Form, Row, Col, FormControl, Table, Dropdown, Container, Modal } from 'react-bootstrap';
-import { FaArrowCircleUp, FaSearch } from 'react-icons/fa';
+import { FaArrowCircleUp, FaRecycle, FaSearch } from 'react-icons/fa';
 import { FaArrowsRotate, FaFilter, FaPlus, FaAlignJustify } from "react-icons/fa6";
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
 
 export default function Page() {
+
+    const router = useRouter();
+
     const getAllVehicles = async () => {
         const simulatedData = [
-            { make: 'Tesla', model: 'Model S', year: 2022, registration: 'TES123', available: true },
-            { make: 'BMW', model: 'X5', year: 2021, registration: 'BMW456', available: false },
-            { make: 'Audi', model: 'A4', year: 2020, registration: 'AUD789', available: true },
-            { make: 'Mercedes', model: 'C-Class', year: 2019, registration: 'MER321', available: false },
-            { make: 'Volkswagen', model: 'Golf', year: 2023, registration: 'VW654', available: true },
+            { make: 'Tesla', model: 'Model S', year: 2022, registration: 'TES123', available: true, fuel: 'Electrique' },
+            { make: 'BMW', model: 'X5', year: 2021, registration: 'BMW456', available: false, fuel: 'Essence' },
+            { make: 'Audi', model: 'A4', year: 2020, registration: 'AUD789', available: true, fuel: 'Hybrid' },
+            { make: 'Mercedes', model: 'C-Class', year: 2019, registration: 'MER321', available: false, fuel: 'Diesel' },
+            { make: 'Volkswagen', model: 'Golf', year: 2023, registration: 'VW654', available: true, fuel: 'Hybrid' },
         ];
         return simulatedData;
     };
 
     const [vehicles, setVehicles] = useState<any[]>([]);
     const [showModal, setShowModal] = useState(false);
-    const [newVehicle, setNewVehicle] = useState({ make: '', model: '', year: '', registration: '', available: false });
+    const [newVehicle, setNewVehicle] = useState({ make: '', model: '', year: '', registration: '', available: false, fuel: '' });
 
     React.useEffect(() => {
         const fetchVehicles = async () => {
@@ -33,7 +38,7 @@ export default function Page() {
     const handleAddVehicle = () => {
         setVehicles([...vehicles, { ...newVehicle, year: parseInt(newVehicle.year) }]);
         setShowModal(false);
-        setNewVehicle({ make: '', model: '', year: '', registration: '', available: false });
+        setNewVehicle({ make: '', model: '', year: '', registration: '', available: false, fuel: '' });
     };
 
     return (
@@ -43,7 +48,19 @@ export default function Page() {
                 <p className="mb-5 text-secondary fs-5">Gérez les véhicules de votre flotte ici.</p>
                 <div className="mb-4">
                     <Row className="w-100 justify-content-between align-items-center">
-                        <Col xs={12} className="d-flex justify-content-end align-items-center flex-wrap gap-2 mb-3">
+                        {/* Liste des véhicules */}
+
+                        <Col xs={6} className="d-flex align-items-center flex-nowrap mb-3">
+                            <h4 className="fs-2 fs-sm-3 fs-md-4 fs-lg-5 fs-xl-6">
+                                Tous les véhicules
+                            </h4>
+                        </Col>
+
+                        <Col xs={6} className="d-flex justify-content-end align-items-center flex-nowrap mb-3">
+                            <Button variant="danger" className="me-1">
+                                <FaRecycle className="me-0 me-lg-2" />
+                                <span className="d-lg-inline d-none">Supprimer</span>
+                            </Button>
                             <Button variant="primary" className='text-light' onClick={() => setShowModal(true)}>
                                 <FaPlus className="me-2" />
                                 Ajouter un véhicule
@@ -51,21 +68,11 @@ export default function Page() {
                         </Col>
 
 
-                        {/* Liste des véhicules */}
-
-                        <Col xs={12} className="d-flex align-items-center flex-nowrap mb-3">
-                            <h4 className="fs-2 fs-sm-3 fs-md-4 fs-lg-5 fs-xl-6">
-                                Tous les véhicules
-                            </h4>
-                        </Col>
-
                         <Col xs={12} className="d-flex flex-wrap gap-3 mb-4 dashboard-cards-row">
                             {[
                                 { title: "Total Véhicules", value: vehicles.length, className: "dashboard-card-dark" },
                                 { title: "Disponibles", value: vehicles.filter(v => v.available).length || 0, className: "dashboard-card-light" },
-                                { title: "Marques Uniques", value: new Set(vehicles.map(v => v.make)).size, className: "dashboard-card-light" },
-                                { title: "Année Moyenne", value: (vehicles.reduce((sum, v) => sum + v.year, 0) / vehicles.length || 0).toFixed(0), className: "dashboard-card-light" },
-                                { title: "Modèles Uniques", value: new Set(vehicles.map(v => v.model)).size, className: "dashboard-card-light" },
+                                { title: "Ecologiques 🍃", value: vehicles.filter(v => v.fuel === 'Electrique' || v.fuel === 'Hybrid').length || 0, className: "dashboard-card-light" },
                             ].map((stat, index) => (
                                 <Card
                                     key={index}
@@ -123,30 +130,33 @@ export default function Page() {
                                 <table className="sparkotto-table">
                                     <thead>
                                         <tr>
-                                            <th> <input type="checkbox" /></th>
+                                            <th></th>
                                             <th>ID VEH</th>
                                             <th>Année</th>
                                             <th>Marque</th>
                                             <th>Model</th>
                                             <th>Disponible</th>
-                                            <th>Actions</th>
+                                            <th>Carburant</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {vehicles.map((vehicle, index) => (
-                                            <tr key={index}>
-                                                <th> <input type="checkbox" /></th>
+                                            <tr
+                                                key={index}
+                                                onClick={(e) => {
+                                                    if (e.target.type !== 'checkbox') {
+                                                        router.push(`/admin/vehicle/${index + 1}/detail/`);
+                                                    }
+                                                }}
+                                                style={{ cursor: 'pointer' }}
+                                            >
+                                                <td> <input type="checkbox" onClick={(e) => e.stopPropagation()} /></td>
                                                 <td><a href="#">{`SPK${index + 1}`}</a></td>
                                                 <td>{vehicle.year}</td>
                                                 <td>{vehicle.make}</td>
                                                 <td>{vehicle.model}</td>
                                                 <td>{vehicle.available ? 'Oui' : 'Non'}</td>
-                                                <td>
-                                                    <Button variant="yellow" size="sm" className="me-2 d-flex align-items-center">
-                                                        <FaArrowCircleUp className="me-1" />
-                                                        Détails
-                                                    </Button>
-                                                </td>
+                                                <td>{vehicle.fuel}</td>
                                             </tr>
                                         ))}
                                     </tbody>
