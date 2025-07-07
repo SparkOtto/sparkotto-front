@@ -12,14 +12,12 @@ export default function VehicleDetail() {
     const [loading, setLoading] = useState(true);
 
     const getVehicleById = async (vehicleId) => {
-        const simulatedData = [
-            { id: 1, make: 'Tesla', model: 'Model S', year: 2022, registration: 'TES123', available: true, mileage: 7800, costPerKm: 7800 },
-            { id: 2, make: 'BMW', model: 'X5', year: 2021, registration: 'BMW456', available: false, mileage: 12000, costPerKm: 12000 },
-            { id: 3, make: 'Audi', model: 'A4', year: 2020, registration: 'AUD789', available: true, mileage: 9000, costPerKm: 9000 },
-            { id: 4, make: 'Mercedes', model: 'C-Class', year: 2019, registration: 'MER321', available: false, mileage: 15000, costPerKm: 15000 },
-            { id: 5, make: 'Volkswagen', model: 'Golf', year: 2023, registration: 'VW654', available: true, mileage: 5000, costPerKm: 5000 },
-        ];
-        return simulatedData.find(v => v.id === Number(vehicleId)) || null;
+        const response = await fetch(`/api/vehicles/${vehicleId}`);
+        console.log(response);
+        if (!response.ok) {
+            throw new Error('Failed to fetch vehicle data');
+        }
+        return await response.json();
     };
 
     useEffect(() => {

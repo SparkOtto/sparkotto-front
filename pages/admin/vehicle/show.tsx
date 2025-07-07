@@ -166,7 +166,6 @@ export default function Page() {
                                         <tr>
                                             <th></th>
                                             <th>ID VEH</th>
-                                            <th>Année</th>
                                             <th>Marque</th>
                                             <th>Model</th>
                                             <th>Disponible</th>
@@ -186,11 +185,10 @@ export default function Page() {
                                             >
                                                 <td> <input type="checkbox" onClick={(e) => e.stopPropagation()} /></td>
                                                 <td><a href="#">{`SPK${index + 1}`}</a></td>
-                                                <td>{vehicle.year}</td>
-                                                <td>{vehicle.make}</td>
+                                                <td>{vehicle.brand}</td>
                                                 <td>{vehicle.model}</td>
                                                 <td>{vehicle.available ? 'Oui' : 'Non'}</td>
-                                                <td>{vehicle.fuel}</td>
+                                                <td>ID : {vehicle.fuelTypeId}</td>
                                             </tr>
                                         ))}
                                     </tbody>
