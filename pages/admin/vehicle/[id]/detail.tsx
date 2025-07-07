@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../../../../components/Layout';
-import { Button, Container, Row, Col, Spinner, Form } from 'react-bootstrap';
+import { Button, Container, Row, Col, Spinner, Card, Form } from 'react-bootstrap';
 import { useRouter } from 'next/router';
+import { FaArrowLeft } from 'react-icons/fa';
 
 export default function VehicleDetail() {
     const router = useRouter();
@@ -57,70 +58,71 @@ export default function VehicleDetail() {
 
     return (
         <Layout>
-            <Container fluid className="vh-100 bg-light d-flex flex-column align-items-center">
-                <div className="w-100" style={{ maxWidth: 600, marginTop: 60 }}>
-                    <div className="d-flex justify-content-between align-items-center mb-4">
-                        <Button variant="dark" className="px-4 py-2 fw-bold" onClick={() => router.push('/admin/vehicle/show')}>
-                            &lt; Retour
+            <Container className="py-5">
+                <Row className="mb-4">
+                    <Col>
+                        <Button variant="dark" onClick={() => router.push('/admin/vehicle/show')} className="d-flex align-items-center gap-2">
+                            <FaArrowLeft />
+                            Retour
                         </Button>
-                    </div>
-                    <div className="bg-dark rounded p-4 shadow mb-4">
-                        <Form>
-                            <Row className="mb-4">
-                                <Col>
-                                    <Form.Group>
-                                        <Form.Label className="text-white fw-bold">Vehicle-ID</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            value={vehicle.registration}
-                                            readOnly
-                                            className="bg-secondary text-white border-0 rounded"
-                                        />
-                                    </Form.Group>
-                                </Col>
-                                <Col>
-                                    <Form.Group>
-                                        <Form.Label className="text-white fw-bold">Date</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            placeholder="MM/DD/YY"
-                                            className="bg-secondary text-white border-0 rounded"
-                                        />
-                                    </Form.Group>
-                                </Col>
-                            </Row>
-                            <Row className="mb-4">
-                                <Col>
-                                    <Form.Group>
-                                        <Form.Label className="text-white fw-bold">Kilométrage actuel</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            value={vehicle.mileage?.toLocaleString() || ''}
-                                            readOnly
-                                            className="bg-secondary text-white border-0 rounded"
-                                        />
-                                    </Form.Group>
-                                </Col>
-                                <Col>
-                                    <Form.Group>
-                                        <Form.Label className="text-white fw-bold">Coût au kilométrage</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            value={vehicle.costPerKm?.toLocaleString() || ''}
-                                            readOnly
-                                            className="bg-secondary text-white border-0 rounded"
-                                        />
-                                    </Form.Group>
-                                </Col>
-                            </Row>
-                            <div className="d-flex justify-content-center mt-4">
-                                <Button variant="dark" className="w-50 rounded fw-bold shadow">
-                                    Ajouter
-                                </Button>
-                            </div>
-                        </Form>
-                    </div>
-                </div>
+                    </Col>
+                </Row>
+                <Row className="justify-content-center">
+                    <h2 className='mb-5 text-center'>Détails du véhicule : {vehicle.make} {vehicle.model}</h2>
+                    <Col md={8}>
+                        <Card className="shadow-lg">
+                            <Card.Body className="p-4 bg-dark">
+                                <Row className="mb-3">
+                                    <Col md={6}>
+                                        <Card className="p-3 bg-dark text-white border-1 border-light">
+                                            <h6 className="text-light">Marque</h6>
+                                            <p className="fs-5">{vehicle.make}</p>
+                                        </Card>
+                                    </Col>
+                                    <Col md={6}>
+                                        <Card className="p-3 bg-dark text-white border-1 border-light">
+                                            <h6 className="text-light">Modèle</h6>
+                                            <p className="fs-5">{vehicle.model}</p>
+                                        </Card>
+                                    </Col>
+                                </Row>
+                                <Row className="mb-3">
+                                    <Col md={6}>
+                                        <Card className="p-3 bg-dark text-white border-1 border-light">
+                                            <h6 className="text-light">Année</h6>
+                                            <p className="fs-5">{vehicle.year}</p>
+                                        </Card>
+                                    </Col>
+                                    <Col md={6}>
+                                        <Card className="p-3 bg-dark text-white border-1 border-light">
+                                            <h6 className="text-light">Immatriculation</h6>
+                                            <p className="fs-5">{vehicle.registration}</p>
+                                        </Card>
+                                    </Col>
+                                </Row>
+                                <Row className="mb-3">
+                                    <Col md={6}>
+                                        <Card className="p-3 bg-dark text-white border-1 border-light">
+                                            <h6 className="text-light">Kilométrage</h6>
+                                            <p className="fs-5">{vehicle.mileage?.toLocaleString()} km</p>
+                                        </Card>
+                                    </Col>
+                                    <Col md={6}>
+                                        <Card className="p-3 bg-dark text-white border-1 border-light">
+                                            <h6 className="text-light">Coût par km</h6>
+                                            <p className="fs-5">{vehicle.costPerKm?.toLocaleString()} €</p>
+                                        </Card>
+                                    </Col>
+                                </Row>
+                                <div className="text-center mt-4">
+                                    <Button variant="warning" className="px-5">
+                                        Modifier
+                                    </Button>
+                                </div>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                </Row>
             </Container>
         </Layout>
     );
