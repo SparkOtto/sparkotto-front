@@ -11,19 +11,34 @@ export default function Page() {
     const router = useRouter();
 
     const getAllVehicles = async () => {
-        const simulatedData = [
-            { make: 'Tesla', model: 'Model S', year: 2022, registration: 'TES123', available: true, fuel: 'Electrique' },
-            { make: 'BMW', model: 'X5', year: 2021, registration: 'BMW456', available: false, fuel: 'Essence' },
-            { make: 'Audi', model: 'A4', year: 2020, registration: 'AUD789', available: true, fuel: 'Hybrid' },
-            { make: 'Mercedes', model: 'C-Class', year: 2019, registration: 'MER321', available: false, fuel: 'Diesel' },
-            { make: 'Volkswagen', model: 'Golf', year: 2023, registration: 'VW654', available: true, fuel: 'Hybrid' },
-        ];
-        return simulatedData;
-    };
+        try {
+            const response = await fetch(`${process.env.backendAPI}/api/vehicles`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+
+                if (response.status === 500) {
+                    console.error('Server error:', data.message);
+                    return;
+                }
+            } else {
+                const data = await response.json();
+                return data; // Return the user data
+            }
+
+        } catch (error) {
+            console.error('Error fetching users:', error);
+        }
+    }
 
     const [vehicles, setVehicles] = useState<any[]>([]);
     const [showModal, setShowModal] = useState(false);
-    const [newVehicle, setNewVehicle] = useState({ make: '', model: '', year: '', registration: '', available: false, fuel: '' });
+    const [newVehicle, setNewVehicle] = useState({ brand: '', model: '', fuelTypeId: '', license_plate: '', mileage: '', seat_count: '', fuel_capacity: '', transmissionId: '' });
 
     React.useEffect(() => {
         const fetchVehicles = async () => {
@@ -35,10 +50,29 @@ export default function Page() {
         fetchVehicles();
     }, []);
 
-    const handleAddVehicle = () => {
-        setVehicles([...vehicles, { ...newVehicle, year: parseInt(newVehicle.year) }]);
-        setShowModal(false);
-        setNewVehicle({ make: '', model: '', year: '', registration: '', available: false, fuel: '' });
+    const handleAddVehicle = async () => {
+        try {
+            const response = await fetch(`${process.env.backendAPI}/api/vehicles`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ ...newVehicle, year: parseInt(newVehicle.year) }),
+            });
+
+            console.log(response);
+
+            if (response.ok) {
+                const addedVehicle = await response.json();
+                setVehicles([...vehicles, addedVehicle]);
+                setShowModal(false);
+                setNewVehicle({ brand: '', model: '', fuelTypeId: '', license_plate: '', mileage: '', seat_count: '', fuel_capacity: '', transmissionId: '' });
+            } else {
+                console.error('Failed to add vehicle:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error adding vehicle:', error);
+        }
     };
 
     return (
@@ -168,59 +202,109 @@ export default function Page() {
             </Container>
 
             {/* Modal for adding a vehicle */}
-            <Modal show={showModal} onHide={() => setShowModal(false)}>
-                <Modal.Header closeButton>
+            <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+                <Modal.Header closeButton className="bg-purple text-light">
                     <Modal.Title>Ajouter un véhicule</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Marque</Form.Label>
-                            <Form.Control
-                                type="text"
-                                value={newVehicle.make}
-                                onChange={(e) => setNewVehicle({ ...newVehicle, make: e.target.value })}
-                            />
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Modèle</Form.Label>
-                            <Form.Control
-                                type="text"
-                                value={newVehicle.model}
-                                onChange={(e) => setNewVehicle({ ...newVehicle, model: e.target.value })}
-                            />
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Année</Form.Label>
-                            <Form.Control
-                                type="number"
-                                value={newVehicle.year}
-                                onChange={(e) => setNewVehicle({ ...newVehicle, year: e.target.value })}
-                            />
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Immatriculation</Form.Label>
-                            <Form.Control
-                                type="text"
-                                value={newVehicle.registration}
-                                onChange={(e) => setNewVehicle({ ...newVehicle, registration: e.target.value })}
-                            />
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Check
-                                type="checkbox"
-                                label="Disponible"
-                                checked={newVehicle.available}
-                                onChange={(e) => setNewVehicle({ ...newVehicle, available: e.target.checked })}
-                            />
-                        </Form.Group>
+                        <Row className="gy-3">
+                            <Col xs={12} md={6}>
+                                <Form.Group>
+                                    <Form.Label>Marque</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        value={newVehicle.brand}
+                                        onChange={(e) => setNewVehicle({ ...newVehicle, brand: e.target.value })}
+                                        placeholder="Entrez la marque"
+                                    />
+                                </Form.Group>
+                            </Col>
+                            <Col xs={12} md={6}>
+                                <Form.Group>
+                                    <Form.Label>Modèle</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        value={newVehicle.model}
+                                        onChange={(e) => setNewVehicle({ ...newVehicle, model: e.target.value })}
+                                        placeholder="Entrez le modèle"
+                                    />
+                                </Form.Group>
+                            </Col>
+                            <Col xs={12} md={6}>
+                                <Form.Group>
+                                    <Form.Label>Immatriculation</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        value={newVehicle.license_plate}
+                                        onChange={(e) => setNewVehicle({ ...newVehicle, license_plate: e.target.value })}
+                                        placeholder="Entrez l'immatriculation"
+                                    />
+                                </Form.Group>
+                            </Col>
+                            <Col xs={12} md={6}>
+                                <Form.Group>
+                                    <Form.Label>Kilométrage</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        value={newVehicle.mileage}
+                                        onChange={(e) => setNewVehicle({ ...newVehicle, mileage: e.target.value })}
+                                        placeholder="Entrez le kilométrage"
+                                    />
+                                </Form.Group>
+                            </Col>
+                            <Col xs={12} md={6}>
+                                <Form.Group>
+                                    <Form.Label>Nombre de sièges</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        value={newVehicle.seat_count}
+                                        onChange={(e) => setNewVehicle({ ...newVehicle, seat_count: e.target.value })}
+                                        placeholder="Entrez le nombre de sièges"
+                                    />
+                                </Form.Group>
+                            </Col>
+                            <Col xs={12} md={6}>
+                                <Form.Group>
+                                    <Form.Label>Capacité du réservoir</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        value={newVehicle.fuel_capacity}
+                                        onChange={(e) => setNewVehicle({ ...newVehicle, fuel_capacity: e.target.value })}
+                                        placeholder="Entrez la capacité (litres)"
+                                    />
+                                </Form.Group>
+                            </Col>
+                            <Col xs={12} md={6}>
+                                <Form.Group>
+                                    <Form.Label>Transmission</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        value={newVehicle.transmissionId}
+                                        onChange={(e) => setNewVehicle({ ...newVehicle, transmissionId: e.target.value })}
+                                        placeholder="Entrez la transmission"
+                                    />
+                                </Form.Group>
+                            </Col>
+                            <Col xs={12} md={6}>
+                                <Form.Group>
+                                    <Form.Label>Type de carburant</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        value={newVehicle.fuelTypeId}
+                                        onChange={(e) => setNewVehicle({ ...newVehicle, fuelTypeId: e.target.value })}
+                                        placeholder="Entrez le type de carburant"
+                                    />
+                                </Form.Group>
+                            </Col>
+                        </Row>
                     </Form>
                 </Modal.Body>
-                <Modal.Footer>
+                <Modal.Footer className="d-flex justify-content-between">
                     <Button variant="secondary" onClick={() => setShowModal(false)}>
                         Annuler
                     </Button>
-                    <Button variant="primary" className='text-light' onClick={handleAddVehicle}>
+                    <Button variant="yellow" onClick={handleAddVehicle}>
                         Ajouter
                     </Button>
                 </Modal.Footer>
