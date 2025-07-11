@@ -1,0 +1,335 @@
+// Couleur personnalisée
+$purple: #68308E;
+$yellow: #FCCC2E;
+$black: #1F1F1F;
+
+// Couleur bootstrap
+$primary: #007bff;
+$secondary: #6c757d;
+$success: #28a745;
+$info: #17a2b8;
+$warning: #ffc107;
+$danger: #dc3545;
+$light: #f8f9fa;
+$dark: #343a40;
+$gray: #D9D9D9;
+$lightgray: #F4F4F4;
+
+
+// Ajout des couleurs personnalisée à la map des thèmes
+$theme-colors: (
+    "purple": $purple,
+    "yellow": $yellow,
+    "primary": $primary,
+    "secondary": $secondary,
+    "success": $success,
+    "info": $info,
+    "warning": $warning,
+    "danger": $danger,
+    "light": $light,
+    "dark": $dark,
+    "black": $black,
+    "gray": $gray,
+    "lightgray": $lightgray
+);
+
+// Customisation des classes de largeur et de hauteur
+$widths: (
+    5: 5%,
+    10: 10%,
+    20: 20%,
+    30: 30%,
+    40: 40%,
+    50: 50%,
+    60: 60%,
+    70: 70%,
+    80: 80%,
+    90: 90%,
+    100: 100%
+);
+
+$heights: (
+    5: 5%,
+    10: 10%,
+    20: 20%,
+    30: 30%,
+    40: 40%,
+    50: 50%,
+    60: 60%,
+    70: 70%,
+    80: 80%,
+    90: 90%,
+    100: 100%
+);
+
+// Importez Bootstrap
+
+@mixin generate-width-classes {
+    @each $key, $value in $widths {
+      .w-#{$key} {
+        width: $value !important;
+      }
+    }
+  }
+  
+  @mixin generate-height-classes {
+    @each $key, $value in $heights {
+      .h-#{$key} {
+        height: $value !important;
+      }
+    }
+  }
+
+// Ajoutez vos classes de largeur et de hauteur personnalisées
+@include generate-width-classes;
+@include generate-height-classes;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+// Logo
+.logo {
+  width: 25.0em;
+  height: 10.5em;
+}
+
+// .authForm
+.authForm {
+  max-width: 35.0em;
+  width: 35.0em;
+
+}
+
+.height-navbar {
+  min-height: 100vh;
+}
+
+// full responsive media queries for logo
+
+.logo {
+  /* Dimensions par défaut (pour écrans > 1920px) */
+  width: 25em;
+  height: 5.5em;
+  object-fit: contain;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+/* Table styling */
+.sparkotto-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 18px; /* espace entre les lignes */
+  background: none;
+}
+
+/* Header styling */
+.sparkotto-table thead tr {
+  background: #000;
+  color: #fff;
+  font-weight: bold;
+}
+
+.sparkotto-table thead th {
+  padding: 18px 14px;
+  text-align: left;
+  border: none;
+  font-size: 1.1em;
+}
+
+/* Arrondir tous les coins du header */
+.sparkotto-table thead tr th:first-child {
+  border-top-left-radius: 16px;
+  border-bottom-left-radius: 16px;
+}
+.sparkotto-table thead tr th:last-child {
+  border-top-right-radius: 16px;
+  border-bottom-right-radius: 16px;
+}
+
+/* Body styling */
+.sparkotto-table tbody tr {
+  background: #d4d4d5;
+}
+
+.sparkotto-table tbody tr:hover {
+  background: #c4c4c5;
+  transition: background-color 0.3s ease;
+}
+
+.sparkotto-table tbody td {
+  padding: 20px 14px;
+  border: none;
+  vertical-align: middle;
+  font-size: 1em;
+}
+
+.sparkotto-table tbody th {
+  padding: 20px 14px;
+  border: none;
+  vertical-align: middle;
+  font-size: 1em;
+  font-weight: bold;
+  background: #d4d4d5;
+}
+
+
+/* Arrondir tous les coins de chaque ligne */
+.sparkotto-table tbody tr td:first-child {
+  border-top-left-radius: 16px;
+  border-bottom-left-radius: 16px;
+}
+
+.sparkotto-table tbody tr td:last-child {
+  border-top-right-radius: 16px;
+  border-bottom-right-radius: 16px;
+}
+
+.sparkotto-table tbody tr th:first-child {
+  border-top-left-radius: 16px;
+  border-bottom-left-radius: 16px;
+}
+
+.sparkotto-table tbody tr th:last-child {
+  border-top-right-radius: 16px;
+  border-bottom-right-radius: 16px;
+}
+
+.sparkotto-table a {
+  color: #4169e1;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.sparkotto-table input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #4169e1;
+  cursor: pointer;
+}
+
+// Card dashboard admin
+.dashboard-cards-row {
+  justify-content: flex-start;
+}
+
+.dashboard-card {
+  border-radius: 18px !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+  border: none !important;
+  min-height: 120px;
+  background: #f6f7fb;
+  transition: box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.dashboard-card-dark {
+  background: #18191b !important;
+  color: #fff !important;
+}
+
+.dashboard-card-light {
+  background: #f6f7fb !important;
+  color: #222 !important;
+}
+
+.dashboard-card-title {
+  font-size: 1rem;
+  font-weight: 500;
+  opacity: 0.8;
+  font-family: 'Roboto Mono', monospace;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dashboard-card-value {
+  font-size: 2rem;
+  font-weight: 700;
+  font-family: 'Roboto Mono', monospace;
+  letter-spacing: 1px;
+}
+
+.dashboard-card-dots {
+  font-size: 1.3rem;
+  opacity: 0.5;
+  font-family: 'Roboto Mono', monospace;
+}
+
+/* Optionnel : pour l'effet sur hover */
+.dashboard-card:hover {
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+
+@media (max-width: 1920px) {
+  .logo {
+    width: 22em;
+    height: 4.8em; /* Ratio conservé 22/4.8 ≈ 4.58 */
+  }
+}
+
+@media (max-width: 1600px) {
+  .logo {
+    width: 20em;
+    height: 4.4em; /* Ratio ≈ 4.55 */
+  }
+}
+
+@media (max-width: 1400px) {
+  .logo {
+    /* Dimensions idéales spécifiées */
+    width: 18em;
+    height: 4em; /* Ratio 4.5 */
+  }
+}
+
+@media (max-width: 1200px) {
+  .logo {
+    width: 16em;
+    height: 3.5em; /* Ratio ≈ 4.57 */
+  }
+}
+
+@media (max-width: 992px) {
+  .logo {
+    width: 14em;
+    height: 3.1em; /* Ratio ≈ 4.52 */
+  }
+  .height-navbar {
+    min-height: unset;
+  }
+  .sparkotto-table thead, .sparkotto-table tbody, .sparkotto-table tr, .sparkotto-table th, .sparkotto-table td {
+    display: block;
+  }
+  .sparkotto-table thead {
+    display: none;
+  }
+  .sparkotto-table tbody td {
+    padding: 10px 8px;
+    border-bottom: 1px solid #eee;
+    border-radius: 0 !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .logo {
+    width: 12em;
+    height: 2.6em; /* Ratio ≈ 4.61 */
+  }
+}
+
+@media (max-width: 576px) {
+  .logo {
+    width: 10em;
+    height: 2.2em; /* Ratio ≈ 4.54 */
+  }
+}
+
+@import '~bootstrap/scss/bootstrap';
