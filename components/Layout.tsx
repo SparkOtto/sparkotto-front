@@ -8,12 +8,12 @@ export default function Layout({ children }) {
     return (
         <>
         <Row className="mx-0">
-            <Col md={4} xl={2} xxl={2} className="px-0 bg-purple text-white min-vh-100">
+            <Col md={12} lg={3} xl={3} xxl={3} className="px-0 bg-purple text-white height-navbar">
                 <Navbar />
             </Col>
-            <Col md={8} xl={10} xxl={10} className="px-0">
+            <Col md={12} lg={9} xl={9} xxl={9} className="px-0">
                 <HeaderNavbar />
-                <Container>
+                <Container fluid>
                     {children}
                 </Container>
             </Col>

@@ -103,6 +103,10 @@ $heights: (
 
 }
 
+.height-navbar {
+  min-height: 100vh;
+}
+
 // full responsive media queries for logo
 
 .logo {
@@ -145,6 +149,9 @@ $heights: (
   .logo {
     width: 14em;
     height: 3.1em; /* Ratio ≈ 4.52 */
+  }
+  .height-navbar {
+    min-height: unset;
   }
 }
 

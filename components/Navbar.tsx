@@ -28,12 +28,17 @@ export default function Sidebar() {
           Mes trajets à venir
         </Button>
       </Nav>
+      <div className="mt-auto text-center">
+        <Button variant="light" className="d-flex align-items-center">
+          Aide
+        </Button>
+      </div>
     </>
   );
 
   return (
     <>
-      <Navbar bg="purple" expand={false} className="mb-3 d-md-none">
+      <Navbar bg="purple" expand={false} className="mb-3 d-lg-none">
         <Container fluid>
           <Navbar.Brand href="#"><Logo /></Navbar.Brand>
           <Navbar.Toggle aria-controls="offcanvasNavbar" onClick={handleShow} className="bg-yellow" />
@@ -43,7 +48,7 @@ export default function Sidebar() {
             placement="start"
             show={show}
             onHide={handleClose}
-            className="bg-purple relative"
+            className="bg-purple"
           >
             <Offcanvas.Header closeButton>
               <Offcanvas.Title id="offcanvasNavbarLabel"></Offcanvas.Title>
@@ -55,7 +60,7 @@ export default function Sidebar() {
         </Container>
       </Navbar>
 
-      <div className="d-none d-md-flex flex-column bg-purple vh-100 p-3">
+      <div className="d-none d-lg-flex flex-column bg-purple vh-100 p-3">
         <SidebarContent />
       </div>
     </>
