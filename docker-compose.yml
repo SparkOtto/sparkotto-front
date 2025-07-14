@@ -4,10 +4,12 @@ services:
   frontend:
     build:
       context: .
+      dockerfile: ./dockerfile
     pull_policy: build
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=production
       - NEXT_PUBLIC_API_URL=http://backend:3001
+      - TOKEN_GIT_FRONT=${TOKEN_GIT_FRONT}
     restart: always
