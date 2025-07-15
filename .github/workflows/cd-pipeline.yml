@@ -50,4 +50,4 @@ jobs:
     steps:
       - name: Trigger Portainer webhook
         run: |
-          curl -X POST "https://195.15.222.167:9443/api/stacks/webhooks/091f8c9e-0224-4a62-85d3-ffd36cbbf6d6" --insecure
+          curl -X POST https://195.15.222.167:9443/api/stacks/webhooks/${{ secrets.TOKEN_GIT_FRONT }} --insecure
