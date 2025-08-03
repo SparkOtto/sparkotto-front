@@ -32,6 +32,9 @@ export default function Sidebar() {
             <Button variant="yellow" className="mb-3 text-dark" onClick={() => router.push('/admin/vehicle/show')}>
               Gérer les véhicules
             </Button>
+            <Button variant="yellow" className="mb-3 text-dark" onClick={() => router.push('/admin/agency/show')}>
+              Gérer les agences
+            </Button>
           </>
         ) : (
           <>

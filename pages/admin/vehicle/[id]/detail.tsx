@@ -12,7 +12,7 @@ export default function VehicleDetail() {
     const [loading, setLoading] = useState(true);
 
     const getVehicleById = async (vehicleId) => {
-        const response = await fetch(`/api/vehicles/${vehicleId}`);
+        const response = await fetch(`${process.env.backendAPI}/api/vehicles/${vehicleId}`);
         console.log(response);
         if (!response.ok) {
             throw new Error('Failed to fetch vehicle data');
