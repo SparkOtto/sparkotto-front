@@ -7,7 +7,7 @@ const nextConfig = {
       includePaths: [path.join(__dirname, 'public/styles')],
     },
     env: {
-      backendAPI: 'http://192.168.207.89:3001',
+      backendAPI: 'http://localhost:3001',
     },
 };
   
