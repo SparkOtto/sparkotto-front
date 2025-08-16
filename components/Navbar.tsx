@@ -26,29 +26,27 @@ export default function Sidebar() {
       <Nav className="flex-column">
         {router.pathname.startsWith('/admin') ? (
           <>
-            <Button variant="yellow" className="mb-3 text-dark" onClick={() => router.push('/admin/user')}>
+            <Button type="button" variant="yellow" className="mb-3 text-dark" onClick={() => router.push('/admin/user')}>
               Gérer les utilisateurs
             </Button>
-            <Button variant="yellow" className="mb-3 text-dark" onClick={() => router.push('/admin/vehicle/show')}>
+            <Button type="button" variant="yellow" className="mb-3 text-dark" onClick={() => router.push('/admin/vehicle/show')}>
               Gérer les véhicules
+            </Button>
+            <Button type="button" variant="yellow" className="mb-3 text-dark" onClick={() => router.push('/admin/agency/show')}>
+              Gérer les agences
             </Button>
           </>
         ) : (
           <>
-            <Button variant="yellow" className="mb-3 text-dark" onClick={() => router.push('/dashboard')}>
+            <Button type="button" variant="yellow" className="mb-3 text-dark" onClick={() => router.push('/dashboard')}>
               Mes trajets à venir
             </Button>
-            <Button variant="yellow" className="mb-3 text-dark" onClick={() => router.push('/resa')}>
+            <Button type="button" variant="yellow" className="mb-3 text-dark" onClick={() => router.push('/resa')}>
               Réserver un Véhicule
             </Button>
           </>
         )}
       </Nav>
-      <div className="mt-auto text-center">
-        <Button variant="light" className="d-flex align-items-center">
-          Aide
-        </Button>
-      </div>
     </>
   );
 
