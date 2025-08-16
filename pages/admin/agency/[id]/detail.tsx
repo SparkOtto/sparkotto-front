@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Layout from '../../../../components/Layout';
 import { Button, Container, Row, Col, Spinner, Card, Form, Alert } from 'react-bootstrap';
 import { useRouter } from 'next/router';
@@ -7,11 +7,11 @@ import { FaArrowLeft } from 'react-icons/fa';
 type Agency = {
     id_agency: string;
     city: string;
-    postal_code: string;
+    postal_code: number;
     street: string;
     additional_info?: string;
     phone: string;
-    head_office: string;
+    head_office: string | boolean | number;
 };
 
 export default function AgencyDetail() {
@@ -21,10 +21,17 @@ export default function AgencyDetail() {
     const [agency, setAgency] = useState<Agency | null>(null);
     const [loading, setLoading] = useState(true);
     const [editMode, setEditMode] = useState(false);
-    const [form, setForm] = useState<Agency | null>(null);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
+
+    // refs pour chaque champ
+    const cityRef = useRef<HTMLInputElement>(null);
+    const postalRef = useRef<HTMLInputElement>(null);
+    const streetRef = useRef<HTMLInputElement>(null);
+    const addInfoRef = useRef<HTMLInputElement>(null);
+    const phoneRef = useRef<HTMLInputElement>(null);
+    const headOfficeRef = useRef<HTMLInputElement>(null);
 
     const getAgencyById = async (agencyId: string | string[] | undefined) => {
         const response = await fetch(`${process.env.backendAPI}/api/agency/${agencyId}`);
@@ -37,38 +44,30 @@ export default function AgencyDetail() {
     useEffect(() => {
         if (!id) return;
         setLoading(true);
-        getAgencyById(id).then(agencyData => {
-            setAgency(agencyData);
-            setForm(agencyData);
-            setLoading(false);
-        }).catch(() => setLoading(false));
+        getAgencyById(id)
+            .then((agencyData) => {
+                setAgency(agencyData);
+                setLoading(false);
+            })
+            .catch(() => setLoading(false));
     }, [id]);
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (!form) return;
-        const { name, value } = e.target;
-        setForm({ ...form, [name]: value });
-    };
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!agency) return;
         setSaving(true);
         setError(null);
         setSuccess(false);
 
-        // Préparer les données du formulaire : convertir head_office en booléen
-        const preparedForm = form
-            ? {
-                ...form,
-                head_office:
-                    form.head_office === 'oui' ||
-                    form.head_office === 'true' ||
-                    form.head_office === '1' ||
-                    form.head_office === true
-                        ? true
-                        : false,
-            }
-            : null;
+        const preparedForm = {
+            ...agency,
+            city: cityRef.current?.value || '',
+            postal_code: Number(postalRef.current?.value) || 0,
+            street: streetRef.current?.value || '',
+            additional_info: addInfoRef.current?.value || '',
+            phone: phoneRef.current?.value || '',
+            head_office: headOfficeRef.current?.checked ? true : false,
+        };
 
         try {
             const response = await fetch(`${process.env.backendAPI}/api/agency/${id}`, {
@@ -79,7 +78,6 @@ export default function AgencyDetail() {
             if (!response.ok) throw new Error('Erreur lors de la sauvegarde');
             const updated = await response.json();
             setAgency(updated);
-            setForm(updated);
             setEditMode(false);
             setSuccess(true);
         } catch (err: any) {
@@ -126,7 +124,7 @@ export default function AgencyDetail() {
                     </Col>
                 </Row>
                 <Row className="justify-content-center">
-                    <h2 className='mb-5 text-center'>Détails de l'agence de : {agency.city}</h2>
+                    <h2 className="mb-5 text-center">Détails de l'agence de : {agency.city}</h2>
                     <Col md={8}>
                         <Card className="shadow-lg">
                             <Card.Body className="p-4 bg-dark">
@@ -173,11 +171,11 @@ export default function AgencyDetail() {
                                                 <Card className="p-3 bg-dark text-white border-1 border-light">
                                                     <h6 className="text-light">Siège social</h6>
                                                     <p className="fs-5">
-                                                        {(agency.head_office === true ||
-                                                          agency.head_office === 'oui' ||
-                                                          agency.head_office === 'true' ||
-                                                          agency.head_office === '1' ||
-                                                          agency.head_office === 1)
+                                                        {agency.head_office === true ||
+                                                        agency.head_office === 'oui' ||
+                                                        agency.head_office === 'true' ||
+                                                        agency.head_office === '1' ||
+                                                        agency.head_office === 1
                                                             ? 'Oui'
                                                             : 'Non'}
                                                     </p>
@@ -196,25 +194,13 @@ export default function AgencyDetail() {
                                             <Col md={6}>
                                                 <Form.Group>
                                                     <Form.Label className="text-light">Ville</Form.Label>
-                                                    <Form.Control
-                                                        type="text"
-                                                        name="city"
-                                                        value={form?.city || ''}
-                                                        onChange={handleChange}
-                                                        required
-                                                    />
+                                                    <Form.Control type="text" defaultValue={agency.city} ref={cityRef} required />
                                                 </Form.Group>
                                             </Col>
                                             <Col md={6}>
                                                 <Form.Group>
                                                     <Form.Label className="text-light">Code Postal</Form.Label>
-                                                    <Form.Control
-                                                        type="text"
-                                                        name="postal_code"
-                                                        value={form?.postal_code || ''}
-                                                        onChange={handleChange}
-                                                        required
-                                                    />
+                                                    <Form.Control type="number" defaultValue={agency.postal_code} ref={postalRef} required />
                                                 </Form.Group>
                                             </Col>
                                         </Row>
@@ -222,24 +208,13 @@ export default function AgencyDetail() {
                                             <Col md={6}>
                                                 <Form.Group>
                                                     <Form.Label className="text-light">Rue</Form.Label>
-                                                    <Form.Control
-                                                        type="text"
-                                                        name="street"
-                                                        value={form?.street || ''}
-                                                        onChange={handleChange}
-                                                        required
-                                                    />
+                                                    <Form.Control type="text" defaultValue={agency.street} ref={streetRef} required />
                                                 </Form.Group>
                                             </Col>
                                             <Col md={6}>
                                                 <Form.Group>
                                                     <Form.Label className="text-light">Complément d'adresse</Form.Label>
-                                                    <Form.Control
-                                                        type="text"
-                                                        name="additional_info"
-                                                        value={form?.additional_info || ''}
-                                                        onChange={handleChange}
-                                                    />
+                                                    <Form.Control type="text" defaultValue={agency.additional_info || ''} ref={addInfoRef} />
                                                 </Form.Group>
                                             </Col>
                                         </Row>
@@ -247,13 +222,7 @@ export default function AgencyDetail() {
                                             <Col md={6}>
                                                 <Form.Group>
                                                     <Form.Label className="text-light">Téléphone</Form.Label>
-                                                    <Form.Control
-                                                        type="text"
-                                                        name="phone"
-                                                        value={form?.phone || ''}
-                                                        onChange={handleChange}
-                                                        required
-                                                    />
+                                                    <Form.Control type="text" defaultValue={agency.phone} ref={phoneRef} required />
                                                 </Form.Group>
                                             </Col>
                                             <Col md={6}>
@@ -262,29 +231,20 @@ export default function AgencyDetail() {
                                                     <Form.Check
                                                         type="checkbox"
                                                         label={<span className="fw-bold text-white">Siège social</span>}
-                                                        name="head_office"
-                                                        id="head_office_checkbox"
-                                                        checked={
-                                                            form?.head_office === true ||
-                                                            form?.head_office === 'oui' ||
-                                                            form?.head_office === 'true' ||
-                                                            form?.head_office === '1' ||
-                                                            form?.head_office === 1
+                                                        defaultChecked={
+                                                            agency.head_office === true ||
+                                                            agency.head_office === 'oui' ||
+                                                            agency.head_office === 'true' ||
+                                                            agency.head_office === '1' ||
+                                                            agency.head_office === 1
                                                         }
-                                                        onChange={e =>
-                                                            setForm(form =>
-                                                                form
-                                                                    ? { ...form, head_office: e.target.checked }
-                                                                    : form
-                                                            )
-                                                        }
-                                                        className="custom-checkbox"
+                                                        ref={headOfficeRef}
                                                     />
                                                 </Form.Group>
                                             </Col>
                                         </Row>
                                         <div className="text-center mt-4 d-flex justify-content-center gap-3">
-                                            <Button variant="secondary" onClick={() => { setEditMode(false); setForm(agency); }} disabled={saving}>
+                                            <Button variant="secondary" onClick={() => setEditMode(false)} disabled={saving}>
                                                 Annuler
                                             </Button>
                                             <Button variant="yellow" type="submit" className="px-5" disabled={saving}>

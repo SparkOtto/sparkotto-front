@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Layout from '../../../components/Layout';
-import { Card, Button, Form, Row, Col, FormControl, Table, Dropdown, Container, Modal } from 'react-bootstrap';
-import { FaRecycle, FaSearch } from 'react-icons/fa';
-import { FaArrowsRotate, FaFilter, FaPlus, FaTrash } from "react-icons/fa6";
+import { Card, Button, Form, Row, Col, Table, Container, Modal } from 'react-bootstrap';
+import { FaPlus, FaTrash } from "react-icons/fa6";
 import { useRouter } from 'next/router';
-import { cp } from 'fs';
 import { ToastContainer, toast } from 'react-toastify';
 
 export default function Page() {
@@ -37,14 +35,14 @@ export default function Page() {
 
     const [agencies, setAgencies] = useState<any[]>([]);
     const [showModal, setShowModal] = useState(false);
-    const [newAgency, setNewAgency] = useState({
-        city: '',
-        postal_code: '',
-        street: '',
-        additional_info: '',
-        phone: '',
-        head_office: false,
-    });
+
+    // Refs pour les inputs
+    const cityRef = useRef<HTMLInputElement>(null);
+    const postalCodeRef = useRef<HTMLInputElement>(null);
+    const streetRef = useRef<HTMLInputElement>(null);
+    const additionalInfoRef = useRef<HTMLInputElement>(null);
+    const phoneRef = useRef<HTMLInputElement>(null);
+    const headOfficeRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         const fetchAgencies = async () => {
@@ -58,10 +56,13 @@ export default function Page() {
 
     const handleAddAgency = async () => {
         try {
-            // Ensure postal_code is an integer
             const agencyToAdd = {
-                ...newAgency,
-                postal_code: parseInt(newAgency.postal_code, 10) || 0,
+                city: cityRef.current?.value || '',
+                postal_code: parseInt(postalCodeRef.current?.value || '0', 10),
+                street: streetRef.current?.value || '',
+                additional_info: additionalInfoRef.current?.value || '',
+                phone: phoneRef.current?.value || '',
+                head_office: headOfficeRef.current?.checked || false,
             };
 
             const response = await fetch(`${process.env.backendAPI}/api/agency`, {
@@ -76,20 +77,20 @@ export default function Page() {
                 const addedAgency = await response.json();
                 setAgencies([...agencies, addedAgency]);
                 setShowModal(false);
-                setNewAgency({
-                    city: '',
-                    postal_code: '',
-                    street: '',
-                    additional_info: '',
-                    phone: '',
-                    head_office: false
-                });
+
+                // Reset des champs
+                if (cityRef.current) cityRef.current.value = '';
+                if (postalCodeRef.current) postalCodeRef.current.value = '';
+                if (streetRef.current) streetRef.current.value = '';
+                if (additionalInfoRef.current) additionalInfoRef.current.value = '';
+                if (phoneRef.current) phoneRef.current.value = '';
+                if (headOfficeRef.current) headOfficeRef.current.checked = false;
+
                 toast.success('Agence ajoutée avec succès !');
             } else {
-                console.log(response);
-                const addedAgency = await response.json();
-                toast.error('Erreur lors de l\'ajout de l\'agence : ' + addedAgency.message);
-                console.error('Failed to add agency:', addedAgency.message);
+                const errorData = await response.json();
+                toast.error('Erreur lors de l\'ajout de l\'agence : ' + errorData.message);
+                console.error('Failed to add agency:', errorData.message);
             }
         } catch (error) {
             console.error('Error adding agency:', error);
@@ -107,12 +108,10 @@ export default function Page() {
                 },
             });
             if (response.ok) {
-                // Optionally, re-fetch agencies from backend to ensure sync
                 const updatedAgencies = await getAllAgencies();
                 if (updatedAgencies) {
                     setAgencies(updatedAgencies);
                 }
-
                 toast.success('Agence supprimée avec succès');
             } else {
                 const deletedAgency = await response.json();
@@ -131,9 +130,7 @@ export default function Page() {
                 <div className="mb-4">
                     <Row className="w-100 justify-content-between align-items-center">
                         <Col xs={6} className="d-flex align-items-center flex-nowrap mb-3">
-                            <h4 className="fs-2 fs-sm-3 fs-md-4 fs-lg-5 fs-xl-6">
-                                Toutes les agences
-                            </h4>
+                            <h4 className="fs-2">Toutes les agences</h4>
                         </Col>
                         <Col xs={6} className="d-flex justify-content-end align-items-center flex-nowrap mb-3">
                             <Button variant="primary" className='text-light' onClick={() => setShowModal(true)}>
@@ -142,56 +139,14 @@ export default function Page() {
                             </Button>
                         </Col>
                         <Col xs={12} className="d-flex flex-wrap gap-3 mb-4 dashboard-cards-row">
-                            {[
-                                { title: "Total Agences", value: agencies.length, className: "dashboard-card-dark" },
-                                // Add more stats if needed
-                            ].map((stat, index) => (
-                                <Card
-                                    key={index}
-                                    className={`dashboard-card ${stat.className} flex-grow-1`}
-                                >
-                                    <Card.Body className="p-3">
-                                        <div className="d-flex justify-content-between align-items-center">
-                                            <span className="dashboard-card-title">{stat.title}</span>
-                                        </div>
-                                        <div className="dashboard-card-value mt-2">{stat.value}</div>
-                                    </Card.Body>
-                                </Card>
-                            ))}
-                        </Col>
-                        <Col xs={12} className="d-flex flex-wrap">
-                            <Form className="d-flex me-2 mb-2 w-100">
-                                <div className="position-relative w-100">
-                                    <FormControl
-                                        type="search"
-                                        placeholder="Rechercher"
-                                        className="py-3 pe-5 rounded-lg w-100"
-                                        aria-label="Search"
-                                    />
-                                    <FaSearch
-                                        className="position-absolute top-50 end-0 translate-middle-y me-3 text-secondary"
-                                    />
-                                </div>
-                            </Form>
-                        </Col>
-                        <Col xs={12} className="d-flex justify-content-end align-items-center flex-wrap gap-2">
-                            <Button variant="secondary" className="me-2">
-                                <FaArrowsRotate className="me-0 me-lg-2" />
-                                <span className="d-lg-inline d-none">Annuler</span>
-                            </Button>
-                            <Dropdown>
-                                <Dropdown.Toggle variant="secondary" id="dropdown-filter">
-                                    <FaFilter className="me-0 me-lg-2" />
-                                    <span className="d-lg-inline d-none">Filtre</span>
-                                </Dropdown.Toggle>
-                                <Dropdown.Menu>
-                                    <Dropdown.Item href="#">Nom A-Z</Dropdown.Item>
-                                    <Dropdown.Item href="#">Nom Z-A</Dropdown.Item>
-                                    <Dropdown.Divider />
-                                    <Dropdown.Item href="#">Ville A-Z</Dropdown.Item>
-                                    <Dropdown.Item href="#">Ville Z-A</Dropdown.Item>
-                                </Dropdown.Menu>
-                            </Dropdown>
+                            <Card className="dashboard-card dashboard-card-dark flex-grow-1">
+                                <Card.Body className="p-3">
+                                    <div className="d-flex justify-content-between align-items-center">
+                                        <span className="dashboard-card-title">Total Agences</span>
+                                    </div>
+                                    <div className="dashboard-card-value mt-2">{agencies.length}</div>
+                                </Card.Body>
+                            </Card>
                         </Col>
                         <Col xs={12}>
                             <div className="table-container">
@@ -260,65 +215,35 @@ export default function Page() {
                             <Col xs={12} md={6}>
                                 <Form.Group>
                                     <Form.Label>Ville</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        value={newAgency.city}
-                                        onChange={(e) => setNewAgency({ ...newAgency, city: e.target.value })}
-                                        placeholder="Entrez la ville"
-                                    />
+                                    <Form.Control type="text" placeholder="Entrez la ville" ref={cityRef} />
                                 </Form.Group>
                             </Col>
                             <Col xs={12} md={6}>
                                 <Form.Group>
                                     <Form.Label>Code Postal</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        value={newAgency.postal_code}
-                                        onChange={(e) => setNewAgency({ ...newAgency, postal_code: e.target.value })}
-                                        placeholder="Entrez le code postal"
-                                    />
+                                    <Form.Control type="text" placeholder="Entrez le code postal" ref={postalCodeRef} />
                                 </Form.Group>
                             </Col>
                             <Col xs={12} md={6}>
                                 <Form.Group>
                                     <Form.Label>Rue</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        value={newAgency.street}
-                                        onChange={(e) => setNewAgency({ ...newAgency, street: e.target.value })}
-                                        placeholder="Entrez la rue"
-                                    />
+                                    <Form.Control type="text" placeholder="Entrez la rue" ref={streetRef} />
                                 </Form.Group>
                             </Col>
                             <Col xs={12} md={6}>
                                 <Form.Group>
                                     <Form.Label>Complément</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        value={newAgency.additional_info}
-                                        onChange={(e) => setNewAgency({ ...newAgency, additional_info: e.target.value })}
-                                        placeholder="Entrez le complément d'adresse"
-                                    />
+                                    <Form.Control type="text" placeholder="Entrez le complément d'adresse" ref={additionalInfoRef} />
                                 </Form.Group>
                             </Col>
                             <Col xs={12} md={6}>
                                 <Form.Group>
                                     <Form.Label>Téléphone</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        value={newAgency.phone}
-                                        onChange={(e) => setNewAgency({ ...newAgency, phone: e.target.value })}
-                                        placeholder="Entrez le téléphone"
-                                    />
+                                    <Form.Control type="text" placeholder="Entrez le téléphone" ref={phoneRef} />
                                 </Form.Group>
                             </Col>
                             <Col xs={12} md={6} className="d-flex align-items-center mt-4">
-                                <Form.Check
-                                    type="checkbox"
-                                    label="Siège"
-                                    checked={newAgency.head_office}
-                                    onChange={(e) => setNewAgency({ ...newAgency, head_office: e.target.checked })}
-                                />
+                                <Form.Check type="checkbox" label="Siège" ref={headOfficeRef} />
                             </Col>
                         </Row>
                     </Form>
