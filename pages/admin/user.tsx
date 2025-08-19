@@ -8,6 +8,7 @@ export default function Page() {
         try {
             const response = await fetch(`${process.env.backendAPI}/api/user`, {
                 method: 'GET',
+                credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
             });
             if (!response.ok) {
@@ -44,6 +45,7 @@ export default function Page() {
         try {
             const response = await fetch(`${process.env.backendAPI}/api/admin/toggleUserStatus/${userId}`, {
                 method: 'PUT',
+                credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ isActive }),
             });
@@ -62,6 +64,7 @@ export default function Page() {
         try {
             const response = await fetch(`${process.env.backendAPI}/api/admin/lockUnlockUser`, {
                 method: 'POST',
+                credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id: userId, isLocked }),
             });

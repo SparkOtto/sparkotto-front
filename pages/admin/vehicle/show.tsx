@@ -31,6 +31,7 @@ export default function Page() {
         try {
             const response = await fetch(`${process.env.backendAPI}/api/vehicles`, {
                 method: 'GET',
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -56,6 +57,7 @@ export default function Page() {
         try {
             const response = await fetch(`${process.env.backendAPI}/api/fueltype`, {
                 method: 'GET',
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -74,6 +76,7 @@ export default function Page() {
         try {
             const response = await fetch(`${process.env.backendAPI}/api/transmission`, {
                 method: 'GET',
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -114,6 +117,7 @@ export default function Page() {
         try {
             const response = await fetch(`${process.env.backendAPI}/api/vehicles`, {
                 method: 'POST',
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -153,6 +157,7 @@ export default function Page() {
         try {
             const response = await fetch(`${process.env.backendAPI}/api/vehicles/${vehicleId}`, {
                 method: 'DELETE',
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                 },

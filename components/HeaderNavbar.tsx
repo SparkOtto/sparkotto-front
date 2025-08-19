@@ -24,6 +24,28 @@ export default function CustomNavbar() {
     }
   }, []);
 
+  // appel API pour le logout
+  const handleLogout = async () => {
+    try {
+      const response = await fetch(`${process.env.backendAPI}/api/auth/logout`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const Cookies = require('js-cookie');
+        Cookies.remove('user');
+        window.location.href = '/';
+      }
+
+    } catch (e) {
+      console.error('Error logging out:', e);
+    }
+  };
+
   return (
     <Navbar className='p-4'>
       <Container fluid>
@@ -51,12 +73,7 @@ export default function CustomNavbar() {
                     </Dropdown.Item>
                     <Dropdown.Item
                       className="text-decoration-none text-dark"
-                      onClick={() => {
-                        const Cookies = require('js-cookie');
-                        Cookies.remove('user');
-                        Cookies.remove('token');
-                        window.location.href = '/';
-                      }}
+                      onClick={handleLogout}
                     >
                       Déconnexion
                     </Dropdown.Item>

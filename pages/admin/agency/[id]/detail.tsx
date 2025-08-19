@@ -34,7 +34,9 @@ export default function AgencyDetail() {
     const headOfficeRef = useRef<HTMLInputElement>(null);
 
     const getAgencyById = async (agencyId: string | string[] | undefined) => {
-        const response = await fetch(`${process.env.backendAPI}/api/agency/${agencyId}`);
+        const response = await fetch(`${process.env.backendAPI}/api/agency/${agencyId}`, {
+            credentials: 'include',
+        });
         if (!response.ok) {
             throw new Error('Failed to fetch agency data');
         }
@@ -72,6 +74,7 @@ export default function AgencyDetail() {
         try {
             const response = await fetch(`${process.env.backendAPI}/api/agency/${id}`, {
                 method: 'PUT',
+                credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(preparedForm),
             });
