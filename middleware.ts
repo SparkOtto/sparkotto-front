@@ -6,8 +6,9 @@ export function middleware(request: NextRequest) {
 
     const protectedRoutes: { [key: string]: string[] } = {
         '/dashboard': ['user', 'admin'],
+        '/reservation': ['user', 'admin'],
         '/profile': ['user', 'admin'],
-        '/admin/user': ['user', 'admin'],
+        '/admin': ['admin'],
     };
 
     const isProtectedRoute = Object.keys(protectedRoutes).some((route) => pathname.startsWith(route));
@@ -25,7 +26,6 @@ export function middleware(request: NextRequest) {
         }
     }
 
-    // Si l'utilisateur est connecté et essaie d'accéder à la page de connexion, redirigez-le vers le tableau de bord
     if (pathname === '/' && authToken) {
         return NextResponse.redirect(new URL('/dashboard', request.url));
     }
@@ -39,9 +39,6 @@ export function middleware(request: NextRequest) {
         if (!userRole || !protectedRoutes[pathname].includes(userRole)) {
             return NextResponse.redirect(new URL('/', request.url));
         }
-
-        // Optionally, you can also check if the user has the required role for the route
-
     }
 
     return NextResponse.next();
@@ -52,7 +49,8 @@ export const config = {
     matcher: [
         '/', 
         '/dashboard',
+        '/reservation',
         '/profile',
-        '/admin/user'
+        '/admin'
     ], 
 };

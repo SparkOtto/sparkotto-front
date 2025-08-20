@@ -41,7 +41,7 @@ export default function Sidebar() {
             <Button type="button" variant="yellow" className="mb-3 text-dark" onClick={() => router.push('/dashboard')}>
               Mes trajets à venir
             </Button>
-            <Button type="button" variant="yellow" className="mb-3 text-dark" onClick={() => router.push('/resa')}>
+            <Button type="button" variant="yellow" className="mb-3 text-dark" onClick={() => router.push('/reservation')}>
               Réserver un Véhicule
             </Button>
           </>
