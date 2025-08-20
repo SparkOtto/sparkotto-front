@@ -45,6 +45,7 @@ export default function Profile() {
             try {
                 const response = await fetch(`${process.env.backendAPI}/api/user/${user.id}`, {
                     method: 'PUT',
+                    credentials: 'include',
                     headers: {
                         'Content-Type': 'application/json',
                     },
@@ -89,6 +90,7 @@ export default function Profile() {
             try {
                 const response = await fetch(`${process.env.backendAPI}/api/user/change-password/${user.id}`, {
                     method: 'POST',
+                    credentials: 'include',
                     headers: {
                         'Content-Type': 'application/json',
                     },

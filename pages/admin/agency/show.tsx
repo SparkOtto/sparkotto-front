@@ -13,6 +13,7 @@ export default function Page() {
         try {
             const response = await fetch(`${process.env.backendAPI}/api/agency`, {
                 method: 'GET',
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -67,6 +68,7 @@ export default function Page() {
 
             const response = await fetch(`${process.env.backendAPI}/api/agency`, {
                 method: 'POST',
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -103,6 +105,7 @@ export default function Page() {
         try {
             const response = await fetch(`${process.env.backendAPI}/api/agency/${agencyId}`, {
                 method: 'DELETE',
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                 },

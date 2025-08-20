@@ -12,8 +12,9 @@ export default function VehicleDetail() {
     const [loading, setLoading] = useState(true);
 
     const getVehicleById = async (vehicleId) => {
-        const response = await fetch(`${process.env.backendAPI}/api/vehicles/${vehicleId}`);
-        console.log(response);
+        const response = await fetch(`${process.env.backendAPI}/api/vehicles/${vehicleId}`, {
+            credentials: 'include',
+        });
         if (!response.ok) {
             throw new Error('Failed to fetch vehicle data');
         }
@@ -74,7 +75,7 @@ export default function VehicleDetail() {
                                     <Col md={6}>
                                         <Card className="p-3 bg-dark text-white border-1 border-light">
                                             <h6 className="text-light">Marque</h6>
-                                            <p className="fs-5">{vehicle.make}</p>
+                                            <p className="fs-5">{vehicle.brand}</p>
                                         </Card>
                                     </Col>
                                     <Col md={6}>
@@ -87,28 +88,14 @@ export default function VehicleDetail() {
                                 <Row className="mb-3">
                                     <Col md={6}>
                                         <Card className="p-3 bg-dark text-white border-1 border-light">
-                                            <h6 className="text-light">Année</h6>
-                                            <p className="fs-5">{vehicle.year}</p>
-                                        </Card>
-                                    </Col>
-                                    <Col md={6}>
-                                        <Card className="p-3 bg-dark text-white border-1 border-light">
                                             <h6 className="text-light">Immatriculation</h6>
-                                            <p className="fs-5">{vehicle.registration}</p>
+                                            <p className="fs-5">{vehicle.license_plate}</p>
                                         </Card>
                                     </Col>
-                                </Row>
-                                <Row className="mb-3">
                                     <Col md={6}>
                                         <Card className="p-3 bg-dark text-white border-1 border-light">
                                             <h6 className="text-light">Kilométrage</h6>
                                             <p className="fs-5">{vehicle.mileage?.toLocaleString()} km</p>
-                                        </Card>
-                                    </Col>
-                                    <Col md={6}>
-                                        <Card className="p-3 bg-dark text-white border-1 border-light">
-                                            <h6 className="text-light">Coût par km</h6>
-                                            <p className="fs-5">{vehicle.costPerKm?.toLocaleString()} €</p>
                                         </Card>
                                     </Col>
                                 </Row>

@@ -1,19 +1,37 @@
-import React, { useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import Layout from '../../../components/Layout';
-import { Card, Button, Form, Row, Col, FormControl, Table, Dropdown, Container, Modal } from 'react-bootstrap';
+import { Card, Button, Form, Row, Col, FormControl, Dropdown, Container, Modal } from 'react-bootstrap';
 import { FaArrowCircleUp, FaRecycle, FaSearch } from 'react-icons/fa';
-import { FaArrowsRotate, FaFilter, FaPlus, FaAlignJustify } from "react-icons/fa6";
-import { useEffect } from 'react';
+import { FaArrowsRotate, FaFilter, FaPlus, FaAlignJustify, FaTrash } from "react-icons/fa6";
 import { useRouter } from 'next/router';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Page() {
-
     const router = useRouter();
 
+    // Refs for modal form fields
+    const brandRef = useRef<HTMLInputElement>(null);
+    const modelRef = useRef<HTMLInputElement>(null);
+    const licensePlateRef = useRef<HTMLInputElement>(null);
+    const mileageRef = useRef<HTMLInputElement>(null);
+    const seatCountRef = useRef<HTMLInputElement>(null);
+    const fuelCapacityRef = useRef<HTMLInputElement>(null);
+    const transmissionIdRef = useRef<HTMLSelectElement>(null);
+    const fuelTypeIdRef = useRef<HTMLSelectElement>(null);
+    const availableRef = useRef<HTMLInputElement>(null);
+
+    const [vehicles, setVehicles] = useState<any[]>([]);
+    const [showModal, setShowModal] = useState(false);
+    const [fuelTypes, setFuelTypes] = useState<any[]>([]);
+    const [transmissions, setTransmissions] = useState<any[]>([]);
+
+    // Fetch all vehicles
     const getAllVehicles = async () => {
         try {
             const response = await fetch(`${process.env.backendAPI}/api/vehicles`, {
                 method: 'GET',
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -21,87 +39,163 @@ export default function Page() {
 
             if (!response.ok) {
                 const data = await response.json();
-
                 if (response.status === 500) {
                     console.error('Server error:', data.message);
                     return;
                 }
             } else {
                 const data = await response.json();
-                return data; // Return the user data
+                return data;
             }
-
         } catch (error) {
-            console.error('Error fetching users:', error);
+            console.error('Error fetching vehicles:', error);
         }
-    }
+    };
 
-    const [vehicles, setVehicles] = useState<any[]>([]);
-    const [showModal, setShowModal] = useState(false);
-    const [newVehicle, setNewVehicle] = useState({ brand: '', model: '', fuelTypeId: '', license_plate: '', mileage: '', seat_count: '', fuel_capacity: '', transmissionId: '' });
-
-    React.useEffect(() => {
-        const fetchVehicles = async () => {
-            const data = await getAllVehicles();
-            if (data) {
-                setVehicles(data);
-            }
-        };
-        fetchVehicles();
-    }, []);
-
-    const handleAddVehicle = async () => {
+    // Fetch all fuel types
+    const getAllFuelTypes = async () => {
         try {
-            const response = await fetch(`${process.env.backendAPI}/api/vehicles`, {
-                method: 'POST',
+            const response = await fetch(`${process.env.backendAPI}/api/fueltype`, {
+                method: 'GET',
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ ...newVehicle, year: parseInt(newVehicle.year) }),
             });
+            if (response.ok) {
+                const data = await response.json();
+                setFuelTypes(data);
+            }
+        } catch (error) {
+            console.error('Error fetching fuel types:', error);
+        }
+    };
 
-            console.log(response);
+    // Fetch all transmissions
+    const getAllTransmissions = async () => {
+        try {
+            const response = await fetch(`${process.env.backendAPI}/api/transmission`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setTransmissions(data);
+            }
+        } catch (error) {
+            console.error('Error fetching transmissions:', error);
+        }
+    };
+
+    useEffect(() => {
+        const fetchVehicles = async () => {
+            const data = await getAllVehicles();
+            if (data) setVehicles(data);
+        };
+        fetchVehicles();
+        getAllFuelTypes();
+        getAllTransmissions();
+    }, []);
+
+    // Add vehicle using refs (no rerender on input)
+    const handleAddVehicle = async () => {
+        const newVehicle = {
+            brand: brandRef.current?.value || '',
+            model: modelRef.current?.value || '',
+            license_plate: licensePlateRef.current?.value || '',
+            mileage: mileageRef.current?.value || '',
+            seat_count: seatCountRef.current?.value || '',
+            fuel_capacity: fuelCapacityRef.current?.value || '',
+            transmissionId: transmissionIdRef.current?.value ? Number(transmissionIdRef.current.value) : null,
+            fuelTypeId: fuelTypeIdRef.current?.value ? Number(fuelTypeIdRef.current.value) : null,
+            available: availableRef.current?.checked || false,
+        };
+
+        try {
+            const response = await fetch(`${process.env.backendAPI}/api/vehicles`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newVehicle),
+            });
 
             if (response.ok) {
                 const addedVehicle = await response.json();
                 setVehicles([...vehicles, addedVehicle]);
                 setShowModal(false);
-                setNewVehicle({ brand: '', model: '', fuelTypeId: '', license_plate: '', mileage: '', seat_count: '', fuel_capacity: '', transmissionId: '' });
+
+                // Reset refs
+                if (brandRef.current) brandRef.current.value = '';
+                if (modelRef.current) modelRef.current.value = '';
+                if (licensePlateRef.current) licensePlateRef.current.value = '';
+                if (mileageRef.current) mileageRef.current.value = '';
+                if (seatCountRef.current) seatCountRef.current.value = '';
+                if (fuelCapacityRef.current) fuelCapacityRef.current.value = '';
+                if (transmissionIdRef.current) transmissionIdRef.current.value = '';
+                if (fuelTypeIdRef.current) fuelTypeIdRef.current.value = '';
+                if (availableRef.current) availableRef.current.checked = false;
+
+                toast.success('Véhicule ajouté avec succès !');
             } else {
-                console.error('Failed to add vehicle:', response.statusText);
+                const errorData = await response.json();
+                toast.error('Erreur lors de l\'ajout du véhicule : ' + errorData.message);
+                console.error('Failed to add vehicle:', errorData.message);
             }
         } catch (error) {
             console.error('Error adding vehicle:', error);
         }
     };
 
+    // Suppression d'un véhicule individuellement
+    const handleDeleteVehicle = async (vehicleId: number) => {
+        if (!window.confirm("Voulez-vous vraiment supprimer ce véhicule ?")) return;
+        try {
+            const response = await fetch(`${process.env.backendAPI}/api/vehicles/${vehicleId}`, {
+                method: 'DELETE',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            if (response.ok) {
+                const updatedVehicles = await getAllVehicles();
+                if (updatedVehicles) {
+                    setVehicles(updatedVehicles);
+                }
+                toast.success('Véhicule supprimé avec succès');
+            } else {
+                const deletedVehicle = await response.json();
+                toast.error('Erreur lors de la suppression du véhicule : ' + deletedVehicle.message);
+            }
+        } catch (error) {
+            console.error('Erreur lors de la suppression:', error);
+        }
+    };
+
     return (
         <Layout>
+            <ToastContainer />
             <Container fluid>
                 <h1 className="mb-4">Gestion des véhicules:</h1>
                 <p className="mb-5 text-secondary fs-5">Gérez les véhicules de votre flotte ici.</p>
                 <div className="mb-4">
                     <Row className="w-100 justify-content-between align-items-center">
-                        {/* Liste des véhicules */}
-
                         <Col xs={6} className="d-flex align-items-center flex-nowrap mb-3">
                             <h4 className="fs-2 fs-sm-3 fs-md-4 fs-lg-5 fs-xl-6">
                                 Tous les véhicules
                             </h4>
                         </Col>
-
                         <Col xs={6} className="d-flex justify-content-end align-items-center flex-nowrap mb-3">
-                            <Button variant="danger" className="me-1">
-                                <FaRecycle className="me-0 me-lg-2" />
-                                <span className="d-lg-inline d-none">Supprimer</span>
-                            </Button>
                             <Button variant="primary" className='text-light' onClick={() => setShowModal(true)}>
                                 <FaPlus className="me-2" />
                                 Ajouter un véhicule
                             </Button>
                         </Col>
-
-
                         <Col xs={12} className="d-flex flex-wrap gap-3 mb-4 dashboard-cards-row">
                             {[
                                 { title: "Total Véhicules", value: vehicles.length, className: "dashboard-card-dark" },
@@ -115,16 +209,12 @@ export default function Page() {
                                     <Card.Body className="p-3">
                                         <div className="d-flex justify-content-between align-items-center">
                                             <span className="dashboard-card-title">{stat.title}</span>
-                                            {/* <span className="dashboard-card-dots">•••</span> */}
                                         </div>
                                         <div className="dashboard-card-value mt-2">{stat.value}</div>
-                                        {/* <div className="dashboard-card-change">+X%</div> */}
                                     </Card.Body>
                                 </Card>
                             ))}
                         </Col>
-
-
                         <Col xs={12} className="d-flex flex-wrap">
                             <Form className="d-flex me-2 mb-2 w-100">
                                 <div className="position-relative w-100">
@@ -164,12 +254,14 @@ export default function Page() {
                                 <table className="sparkotto-table">
                                     <thead>
                                         <tr>
-                                            <th></th>
                                             <th>ID VEH</th>
                                             <th>Marque</th>
                                             <th>Model</th>
                                             <th>Disponible</th>
                                             <th>Carburant</th>
+                                            <th>Transmission</th>
+                                            <th>Agence</th>
+                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -177,18 +269,36 @@ export default function Page() {
                                             <tr
                                                 key={index}
                                                 onClick={(e) => {
-                                                    if (e.target.type !== 'checkbox') {
-                                                        router.push(`/admin/vehicle/${index + 1}/detail/`);
+                                                    if (
+                                                        (e.target as HTMLElement).tagName !== 'INPUT' &&
+                                                        (e.target as HTMLElement).tagName !== 'BUTTON' &&
+                                                        (e.target as HTMLElement).tagName !== 'svg'
+                                                    ) {
+                                                        router.push(`/admin/vehicle/${vehicle.id_vehicle}/detail/`);
                                                     }
                                                 }}
                                                 style={{ cursor: 'pointer' }}
                                             >
-                                                <td> <input type="checkbox" onClick={(e) => e.stopPropagation()} /></td>
-                                                <td><a href="#">{`SPK${index + 1}`}</a></td>
+                                                <td><a href="#">{`SPK${vehicle.id_vehicle}`}</a></td>
                                                 <td>{vehicle.brand}</td>
                                                 <td>{vehicle.model}</td>
                                                 <td>{vehicle.available ? 'Oui' : 'Non'}</td>
-                                                <td>ID : {vehicle.fuelTypeId}</td>
+                                                <td>{vehicle.fuel_type?.fuel_name}</td>
+                                                <td>{vehicle.transmission?.transmission_type}</td>
+                                                <td>{vehicle.agency?.city}</td>
+                                                <td>
+                                                    <Button
+                                                        variant="danger"
+                                                        size="sm"
+                                                        onClick={e => {
+                                                            e.stopPropagation();
+                                                            handleDeleteVehicle(vehicle.id_vehicle);
+                                                        }}
+                                                        title="Supprimer ce véhicule"
+                                                    >
+                                                        <FaTrash />
+                                                    </Button>
+                                                </td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -212,9 +322,8 @@ export default function Page() {
                                     <Form.Label>Marque</Form.Label>
                                     <Form.Control
                                         type="text"
-                                        value={newVehicle.brand}
-                                        onChange={(e) => setNewVehicle({ ...newVehicle, brand: e.target.value })}
                                         placeholder="Entrez la marque"
+                                        ref={brandRef}
                                     />
                                 </Form.Group>
                             </Col>
@@ -223,9 +332,8 @@ export default function Page() {
                                     <Form.Label>Modèle</Form.Label>
                                     <Form.Control
                                         type="text"
-                                        value={newVehicle.model}
-                                        onChange={(e) => setNewVehicle({ ...newVehicle, model: e.target.value })}
                                         placeholder="Entrez le modèle"
+                                        ref={modelRef}
                                     />
                                 </Form.Group>
                             </Col>
@@ -234,9 +342,8 @@ export default function Page() {
                                     <Form.Label>Immatriculation</Form.Label>
                                     <Form.Control
                                         type="text"
-                                        value={newVehicle.license_plate}
-                                        onChange={(e) => setNewVehicle({ ...newVehicle, license_plate: e.target.value })}
                                         placeholder="Entrez l'immatriculation"
+                                        ref={licensePlateRef}
                                     />
                                 </Form.Group>
                             </Col>
@@ -245,9 +352,8 @@ export default function Page() {
                                     <Form.Label>Kilométrage</Form.Label>
                                     <Form.Control
                                         type="number"
-                                        value={newVehicle.mileage}
-                                        onChange={(e) => setNewVehicle({ ...newVehicle, mileage: e.target.value })}
                                         placeholder="Entrez le kilométrage"
+                                        ref={mileageRef}
                                     />
                                 </Form.Group>
                             </Col>
@@ -256,9 +362,8 @@ export default function Page() {
                                     <Form.Label>Nombre de sièges</Form.Label>
                                     <Form.Control
                                         type="number"
-                                        value={newVehicle.seat_count}
-                                        onChange={(e) => setNewVehicle({ ...newVehicle, seat_count: e.target.value })}
                                         placeholder="Entrez le nombre de sièges"
+                                        ref={seatCountRef}
                                     />
                                 </Form.Group>
                             </Col>
@@ -267,31 +372,52 @@ export default function Page() {
                                     <Form.Label>Capacité du réservoir</Form.Label>
                                     <Form.Control
                                         type="number"
-                                        value={newVehicle.fuel_capacity}
-                                        onChange={(e) => setNewVehicle({ ...newVehicle, fuel_capacity: e.target.value })}
                                         placeholder="Entrez la capacité (litres)"
+                                        ref={fuelCapacityRef}
                                     />
                                 </Form.Group>
                             </Col>
                             <Col xs={12} md={6}>
                                 <Form.Group>
                                     <Form.Label>Transmission</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        value={newVehicle.transmissionId}
-                                        onChange={(e) => setNewVehicle({ ...newVehicle, transmissionId: e.target.value })}
-                                        placeholder="Entrez la transmission"
-                                    />
+                                    <Form.Select
+                                        ref={transmissionIdRef}
+                                        defaultValue=""
+                                        aria-label="Sélectionnez une transmission"
+                                    >
+                                        <option value="">Sélectionnez une transmission</option>
+                                        {transmissions.map((trans: any) => (
+                                            <option key={trans.id_transmission} value={trans.id_transmission}>
+                                                {trans.transmission_type}
+                                            </option>
+                                        ))}
+                                    </Form.Select>
                                 </Form.Group>
                             </Col>
                             <Col xs={12} md={6}>
                                 <Form.Group>
                                     <Form.Label>Type de carburant</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        value={newVehicle.fuelTypeId}
-                                        onChange={(e) => setNewVehicle({ ...newVehicle, fuelTypeId: e.target.value })}
-                                        placeholder="Entrez le type de carburant"
+                                    <Form.Select
+                                        ref={fuelTypeIdRef}
+                                        defaultValue=""
+                                        aria-label="Sélectionnez un type de carburant"
+                                    >
+                                        <option value="">Sélectionnez un type</option>
+                                        {fuelTypes.map((fuel: any) => (
+                                            <option key={fuel.id_fuel} value={fuel.id_fuel}>
+                                                {fuel.fuel_name}
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+                                </Form.Group>
+                            </Col>
+                            <Col xs={12} md={6}>
+                                <Form.Group>
+                                    <Form.Label>Disponibilité</Form.Label>
+                                    <Form.Check
+                                        type="checkbox"
+                                        ref={availableRef}
+                                        label="Disponible"
                                     />
                                 </Form.Group>
                             </Col>

@@ -26,6 +26,7 @@ export default function AuthForm() {
     try {
       const response = await fetch(`${process.env.backendAPI}/api/auth/login`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -48,10 +49,8 @@ export default function AuthForm() {
         }
       } else{
         const data = await response.json();
-        const token = data.token;
         const user = data.user;
 
-        Cookies.set('token', token, { expires: 7, secure: true });
         Cookies.set('user', JSON.stringify(user), { expires: 7 });
 
         toast.success('Connexion réussie!');
