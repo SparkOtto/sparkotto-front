@@ -253,7 +253,7 @@ const VehicleAdminDashboard: React.FC = () => {
                                 <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th>Image</th>
+                                        <th></th>
                                         <th>Marque/Modèle</th>
                                         <th>Immatriculation</th>
                                         <th>Carburant</th>
