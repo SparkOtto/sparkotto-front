@@ -58,10 +58,9 @@ const VehicleReservationPage: React.FC = () => {
     }, []);
 
     const getStatus = (vehicle: Vehicle) => {
-        if (!vehicle.available) return "indisponible";
-        if (vehicle.reservedSeats > 0 && vehicle.reservedSeats < vehicle.seat_count)
-            return "covoiturage";
-        if (vehicle.reservedSeats === 0) return "disponible";
+        if (vehicle.available) {
+            return "disponible";
+        }
         return "indisponible";
     };
 
