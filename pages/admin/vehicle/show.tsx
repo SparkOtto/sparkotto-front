@@ -19,12 +19,14 @@ export default function Page() {
     const fuelCapacityRef = useRef<HTMLInputElement>(null);
     const transmissionIdRef = useRef<HTMLSelectElement>(null);
     const fuelTypeIdRef = useRef<HTMLSelectElement>(null);
+    const agencyIdRef = useRef<HTMLSelectElement>(null);
     const availableRef = useRef<HTMLInputElement>(null);
 
     const [vehicles, setVehicles] = useState<any[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [fuelTypes, setFuelTypes] = useState<any[]>([]);
     const [transmissions, setTransmissions] = useState<any[]>([]);
+    const [agencies, setAgencies] = useState<any[]>([]);
 
     // Fetch all vehicles
     const getAllVehicles = async () => {
@@ -49,6 +51,32 @@ export default function Page() {
             }
         } catch (error) {
             console.error('Error fetching vehicles:', error);
+        }
+    };
+
+    // Fetch all agencies
+    const getAllAgencies = async () => {
+        try {
+            const response = await fetch(`${process.env.backendAPI}/api/agency`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                if (response.status === 500) {
+                    console.error('Server error:', data.message);
+                    return;
+                }
+            } else {
+                const data = await response.json();
+                return data;
+            }
+        } catch (error) {
+            console.error('Error fetching agencies:', error);
         }
     };
 
@@ -89,15 +117,19 @@ export default function Page() {
             console.error('Error fetching transmissions:', error);
         }
     };
-
     useEffect(() => {
         const fetchVehicles = async () => {
             const data = await getAllVehicles();
             if (data) setVehicles(data);
         };
+        const fetchAgencies = async () => {
+            const data = await getAllAgencies();
+            if (data) setAgencies(data);
+        };
         fetchVehicles();
         getAllFuelTypes();
         getAllTransmissions();
+        fetchAgencies();
     }, []);
 
     // Add vehicle using refs (no rerender on input)
@@ -106,11 +138,12 @@ export default function Page() {
             brand: brandRef.current?.value || '',
             model: modelRef.current?.value || '',
             license_plate: licensePlateRef.current?.value || '',
-            mileage: mileageRef.current?.value || '',
-            seat_count: seatCountRef.current?.value || '',
-            fuel_capacity: fuelCapacityRef.current?.value || '',
+            mileage: mileageRef.current?.value ? Number(mileageRef.current.value) : null,
+            seat_count: seatCountRef.current?.value ? Number(seatCountRef.current.value) : null,
+            fuel_capacity: fuelCapacityRef.current?.value ? Number(fuelCapacityRef.current.value) : null,
             transmissionId: transmissionIdRef.current?.value ? Number(transmissionIdRef.current.value) : null,
             fuelTypeId: fuelTypeIdRef.current?.value ? Number(fuelTypeIdRef.current.value) : null,
+            agency_id: agencyIdRef.current?.value ? Number(agencyIdRef.current.value) : null,
             available: availableRef.current?.checked || false,
         };
 
@@ -126,6 +159,9 @@ export default function Page() {
 
             if (response.ok) {
                 const addedVehicle = await response.json();
+
+                console.log('Vehicle added:', addedVehicle);
+                
                 setVehicles([...vehicles, addedVehicle]);
                 setShowModal(false);
 
@@ -138,6 +174,7 @@ export default function Page() {
                 if (fuelCapacityRef.current) fuelCapacityRef.current.value = '';
                 if (transmissionIdRef.current) transmissionIdRef.current.value = '';
                 if (fuelTypeIdRef.current) fuelTypeIdRef.current.value = '';
+                if (agencyIdRef.current) agencyIdRef.current.value = '';
                 if (availableRef.current) availableRef.current.checked = false;
 
                 toast.success('Véhicule ajouté avec succès !');
@@ -406,6 +443,23 @@ export default function Page() {
                                         {fuelTypes.map((fuel: any) => (
                                             <option key={fuel.id_fuel} value={fuel.id_fuel}>
                                                 {fuel.fuel_name}
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+                                </Form.Group>
+                            </Col>
+                            <Col xs={12} md={12}>
+                                <Form.Group>
+                                    <Form.Label>Agence</Form.Label>
+                                    <Form.Select
+                                        ref={agencyIdRef}
+                                        defaultValue=""
+                                        aria-label="Sélectionnez une agence"
+                                    >
+                                        <option value="">Sélectionnez une agence</option>
+                                        {agencies.map((agency: any) => (
+                                            <option key={agency.id_agency} value={agency.id_agency}>
+                                                {agency.city}
                                             </option>
                                         ))}
                                     </Form.Select>
