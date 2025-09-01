@@ -46,13 +46,18 @@ type Vehicle = {
     image?: string;
 };
 
-type Reservation = {
-    id_reservation: number;
-    vehicle_id: number;
-    user: { name: string; email: string };
-    start_date: string;
-    end_date: string;
-    status: "en attente" | "validée" | "refusée" | "terminée";
+type Trip = {
+    id_used_key: number;
+    id_vehicle: number;
+    id_driver: number;
+    start_date: Date;
+    end_date: Date;
+    departure_agency: number;
+    arrival_agency: number;
+    reservation_status: string;
+    carpooling: boolean;
+    meeting_time?: Date;
+    meeting_comment?: string;
 };
 
 const ECO_FUELS = ["Hybride", "Electrique"];

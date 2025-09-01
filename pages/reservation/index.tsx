@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../../components/Layout";
 import { Card, Button, Row, Col, Badge, Container, Stack } from "react-bootstrap";
-import Cookies from "js-cookie";
 import { ToastContainer, toast } from "react-toastify";
 import { FaLeaf, FaCar, FaUsers, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import { Modal, Form } from "react-bootstrap";
 
 type Vehicle = {
     id_vehicle: number;
@@ -21,6 +21,33 @@ type Vehicle = {
     transmissionId: number;
     reservedSeats: number;
     image?: string;
+    trips: Trip[];
+};
+
+type Trip = {
+    id_trip: number;
+    id_used_key: number;
+    id_vehicle: number;
+    id_driver: number;
+    start_date: Date;
+    end_date: Date;
+    departure_agency: number;
+    arrival_agency: number;
+    reservation_status: string;
+    carpooling: boolean;
+    carpoolings: string[];
+    meeting_time?: Date;
+    meeting_comment?: string;
+};
+
+type Agency = {
+    id_agency: number;
+    city: string;
+    postal_code: number;
+    street: string;
+    additional_info?: string;
+    phone: string;
+    head_office: boolean;
 };
 
 const ECO_FUELS = ["Hybride", "Electrique"];
@@ -50,52 +77,205 @@ const fetchVehicles = async (): Promise<Vehicle[]> => {
     }
 };
 
+const fetchAgencies = async (): Promise<Agency[]> => {
+    try {
+        const response = await fetch(`${process.env.backendAPI}/api/agency`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            const data = await response.json();
+            if (response.status === 500) {
+                console.error('Server error:', data.message);
+                return;
+            }
+        } else {
+            const data = await response.json();
+            return data;
+        }
+    } catch (error) {
+        console.error('Error fetching agencies:', error);
+    }
+};
+
 const VehicleReservationPage: React.FC = () => {
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+    const [showModal, setShowModal] = useState(false);
+    const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
+    const [reservationInfo, setReservationInfo] = useState({
+        startDate: "",
+        endDate: "",
+        comment: "",
+        etatInterieur: 0,
+        etatExterieur: 0,
+        departureAgency: null,
+        arrivalAgency: null,
+    });
+
+    const [agencies, setAgencies] = useState<Agency[]>([]);
 
     useEffect(() => {
-        fetchVehicles().then(setVehicles);
+        // Fetch vehicles
+        const loadVehicles = async () => {
+            const fetchedVehicles = await fetchVehicles();
+            if (fetchedVehicles) {
+                setVehicles(fetchedVehicles);
+            }
+        };
+        loadVehicles();
+
+        // Fetch agencies
+        const loadAgencies = async () => {
+            const fetchedAgencies = await fetchAgencies();
+            if (fetchedAgencies) {
+                setAgencies(fetchedAgencies);
+            }
+        };
+        loadAgencies();
+
     }, []);
 
     const getStatus = (vehicle: Vehicle) => {
-        if (vehicle.available) {
-            return "disponible";
+        const now = new Date();
+        const trips = vehicle.trips || [];
+        const ongoingTrip = trips.find(
+            (trip) =>
+                new Date(trip.start_date) <= now &&
+                new Date(trip.end_date) >= now &&
+                trip.reservation_status === "confirmed"
+        );
+        if (!vehicle.available) {
+            return "indisponible";
         }
-        return "indisponible";
+        if (ongoingTrip) {
+            if (ongoingTrip.carpoolings && vehicle.seat_count - ongoingTrip.carpoolings.length > 0) {
+                return "covoiturage";
+            }
+            return "indisponible";
+        }
+        return "disponible";
     };
 
     // Dashboard stats
     const total = vehicles.length;
-    const available = vehicles.filter(v => getStatus(v) === "disponible").length;
-    const carpool = vehicles.filter(v => getStatus(v) === "covoiturage").length;
-    const unavailable = vehicles.filter(v => getStatus(v) === "indisponible").length;
+    const available = vehicles.filter((v) => v.available && getStatus(v) === "disponible").length;
+    const carpool = vehicles.filter((v) => v.available && getStatus(v) === "covoiturage").length;
+    const unavailable = vehicles.filter((v) => v.available && getStatus(v) === "indisponible").length;
 
     const renderEcoBadge = (vehicle: Vehicle) =>
         ECO_FUELS.includes(vehicle.fuel_type.fuel_name) ? (
             <Badge bg="success" className="me-2">
                 <FaLeaf />
             </Badge>
-        ) : null;
+    ) : null;
 
     const renderStatus = (vehicle: Vehicle) => {
         const status = getStatus(vehicle);
         switch (status) {
             case "disponible":
-                return <Badge bg="primary"><FaCheckCircle className="me-1" />Disponible</Badge>;
+                return <Badge bg="success"><FaCheckCircle className="me-1" />Disponible</Badge>;
             case "covoiturage":
-                return (
-                    <Badge bg="warning" text="dark">
-                        <FaUsers className="me-1" />
-                        Covoiturage ({vehicle.seat_count - vehicle.reservedSeats} places)
-                    </Badge>
-                );
+                return <Badge bg="warning"><FaUsers className="me-1" />Covoiturage</Badge>;
             default:
                 return <Badge bg="danger"><FaTimesCircle className="me-1" />Indisponible</Badge>;
         }
     };
 
     const handleReserve = (vehicle: Vehicle) => {
-        toast.success(`Réservation pour le véhicule ${vehicle.brand} ${vehicle.model}`);
+        if (getStatus(vehicle) === "indisponible") {
+            toast.error("Ce véhicule est indisponible pour le moment.");
+            return;
+        }
+        if (getStatus(vehicle) === "covoiturage") {
+            toast.info("Ce véhicule est en covoiturage.");
+            return;
+        }
+        if (getStatus(vehicle) === "disponible") {
+            setSelectedVehicle(vehicle);
+            setShowModal(true);
+        }
+    };
+
+    const handleModalClose = () => {
+        setShowModal(false);
+        setSelectedVehicle(null);
+        setReservationInfo({
+            startDate: "",
+            endDate: "",
+            comment: "",
+            etatInterieur: 0,
+            etatExterieur: 0,
+            departureAgency: null,
+            arrivalAgency: null,
+        });
+    };
+
+    const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setReservationInfo({
+            ...reservationInfo,
+            [e.target.name]: e.target.value,
+        });
+    };
+
+    const handleFormSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            await sendReservation(reservationInfo);
+        } catch (error) {
+            toast.error("Erreur lors de l'envoi de la réservation.");
+        }
+        handleModalClose();
+    };
+
+    const sendReservation = async (info: typeof reservationInfo) => {
+        if (!selectedVehicle) return;
+
+        const payload = {
+            id_vehicle: selectedVehicle.id_vehicle,
+            start_date: info.startDate,
+            end_date: info.endDate,
+            comment: info.comment,
+            etat_interieur: info.etatInterieur,
+            etat_exterieur: info.etatExterieur,
+            departure_agency: info.departureAgency,
+            arrival_agency: info.arrivalAgency,
+        };
+
+        try {
+            const response = await fetch(`${process.env.backendAPI}/api/reservations`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                if (response.status === 400) {
+                    toast.error(`Erreur de validation: ${data.message}`);
+                } else if (response.status === 500) {
+                    toast.error(`Erreur serveur: ${data.message}`);
+                } else {
+                    toast.error('Erreur inconnue lors de la réservation.');
+                }
+            } else {
+                toast.success('Réservation envoyée avec succès !');
+                // Optionally refresh vehicle list to reflect new reservation
+                const fetchedVehicles = await fetchVehicles();
+                if (fetchedVehicles) {
+                    setVehicles(fetchedVehicles);
+                }
+            }
+        } catch (error) {
+            console.error('Error sending reservation:', error);
+            toast.error('Erreur réseau lors de la réservation.');
+        }
     };
 
     return (
@@ -205,6 +385,173 @@ const VehicleReservationPage: React.FC = () => {
                     ))}
                 </Row>
             </Container>
+            {/* Reservation Modal */}
+            <Modal show={showModal} onHide={handleModalClose} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Réserver le véhicule</Modal.Title>
+                </Modal.Header>
+                <Form onSubmit={handleFormSubmit}>
+                    <Modal.Body>
+                        <div className="mb-2">
+                            <b>Véhicule:</b> {selectedVehicle?.brand} {selectedVehicle?.model}
+                        </div>
+                        <Row className="mb-3">
+                            <Col md={6}>
+                                <Form.Group controlId="reservationDepartureAgency">
+                                    <Form.Label>Agence de départ</Form.Label>
+                                    <Form.Select
+                                        name="departureAgency"
+                                        value={reservationInfo.departureAgency || ""}
+                                        onChange={(e) =>
+                                            setReservationInfo({
+                                                ...reservationInfo,
+                                                departureAgency: e.target.value,
+                                            })
+                                        }
+                                        required
+                                    >
+                                        <option value="">Sélectionner une agence</option>
+                                        {agencies.map((agency) => (
+                                            <option key={agency.id_agency} value={agency.id_agency}>
+                                                {agency.city} ({agency.street})
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+                                </Form.Group>
+                            </Col>
+                            <Col md={6}>
+                                <Form.Group controlId="reservationStartDate">
+                                    <Form.Label>Date de début</Form.Label>
+                                    <Form.Control
+                                        type="datetime-local"
+                                        name="startDate"
+                                        value={reservationInfo.startDate}
+                                        onChange={handleFormChange}
+                                        required
+                                    />
+                                </Form.Group>
+                            </Col>
+                        </Row>
+                        <Row className="mb-3">
+                            <Col md={6}>
+                                <Form.Group controlId="reservationArrivalAgency">
+                                    <Form.Label>Agence d'arrivée</Form.Label>
+                                    <Form.Select
+                                        name="arrivalAgency"
+                                        value={reservationInfo.arrivalAgency || ""}
+                                        onChange={(e) =>
+                                            setReservationInfo({
+                                                ...reservationInfo,
+                                                arrivalAgency: e.target.value,
+                                            })
+                                        }
+                                        required
+                                    >
+                                        <option value="">Sélectionner une agence</option>
+                                        {agencies.map((agency) => (
+                                            <option key={agency.id_agency} value={agency.id_agency}>
+                                                {agency.city} ({agency.street})
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+                                </Form.Group>
+                            </Col>
+                            <Col md={6}>
+                                <Form.Group controlId="reservationEndDate">
+                                    <Form.Label>Date de fin</Form.Label>
+                                    <Form.Control
+                                        type="datetime-local"
+                                        name="endDate"
+                                        value={reservationInfo.endDate}
+                                        onChange={handleFormChange}
+                                        required
+                                    />
+                                </Form.Group>
+                            </Col>
+                        </Row>
+                        <Row className="mb-3 justify-content-center">
+                            <Col md={12} className="d-flex justify-content-center">
+                                <Form.Group controlId="reservationEtatDesLieux" className="w-100">
+                                    <Form.Label className="w-100 text-center my-3">État des lieux du véhicule</Form.Label>
+                                    <div className="d-flex justify-content-around gap-5">
+                                        {/* État intérieur */}
+                                        <div className="text-center">
+                                            <div className="mb-1 fw-semibold">Intérieur</div>
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                <span
+                                                    key={`interieur-${star}`}
+                                                    style={{
+                                                        cursor: "pointer",
+                                                        color:
+                                                            (reservationInfo.etatInterieur || 0) >= star
+                                                                ? "#ffc107"
+                                                                : "#e4e5e9",
+                                                        fontSize: 24,
+                                                    }}
+                                                    onClick={() =>
+                                                        setReservationInfo({
+                                                            ...reservationInfo,
+                                                            etatInterieur: star,
+                                                        })
+                                                    }
+                                                    data-testid={`star-interieur-${star}`}
+                                                >
+                                                    ★
+                                                </span>
+                                            ))}
+                                        </div>
+                                        {/* État extérieur */}
+                                        <div className="text-center">
+                                            <div className="mb-1 fw-semibold">Extérieur</div>
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                <span
+                                                    key={`exterieur-${star}`}
+                                                    style={{
+                                                        cursor: "pointer",
+                                                        color:
+                                                            (reservationInfo.etatExterieur || 0) >= star
+                                                                ? "#ffc107"
+                                                                : "#e4e5e9",
+                                                        fontSize: 24,
+                                                    }}
+                                                    onClick={() =>
+                                                        setReservationInfo({
+                                                            ...reservationInfo,
+                                                            etatExterieur: star,
+                                                        })
+                                                    }
+                                                    data-testid={`star-exterieur-${star}`}
+                                                >
+                                                    ★
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <Form.Group controlId="reservationComment" className="mt-4">
+                                        <Form.Label>Commentaire (optionnel)</Form.Label>
+                                        <Form.Control
+                                            as="textarea"
+                                            rows={3}
+                                            name="comment"
+                                            value={reservationInfo.comment}
+                                            onChange={handleFormChange}
+                                            placeholder="Ajouter un commentaire pour la réservation"
+                                        />
+                                    </Form.Group>
+                                </Form.Group>
+                            </Col>
+                        </Row>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={handleModalClose}>
+                            Annuler
+                        </Button>
+                        <Button variant="primary" type="submit">
+                            Confirmer la réservation
+                        </Button>
+                    </Modal.Footer>
+                </Form>
+            </Modal>
         </Layout>
     );
 };
