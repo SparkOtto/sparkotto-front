@@ -9,9 +9,7 @@ import {
     Container,
     Stack,
     Table,
-    Dropdown,
     Modal,
-    Form,
     Spinner,
 } from "react-bootstrap";
 import { ToastContainer, toast } from "react-toastify";
@@ -21,44 +19,12 @@ import {
     FaUsers,
     FaCheckCircle,
     FaTimesCircle,
-    FaEdit,
-    FaTrash,
-    FaPlus,
     FaSyncAlt,
     FaEye,
 } from "react-icons/fa";
 
-type Vehicle = {
-    id_vehicle: number;
-    brand: string;
-    model: string;
-    fuel_type: { fuel_name: string };
-    fuelTypeId: number;
-    license_plate: string;
-    mileage: number;
-    seat_count: number;
-    agency_id: number;
-    available: boolean;
-    fuel_capacity?: number;
-    transmission: { transmission_type: string };
-    transmissionId: number;
-    reservedSeats: number;
-    image?: string;
-};
+import { Vehicle, Trip }  from '../../../components/Interface';
 
-type Trip = {
-    id_used_key: number;
-    id_vehicle: number;
-    id_driver: number;
-    start_date: Date;
-    end_date: Date;
-    departure_agency: number;
-    arrival_agency: number;
-    reservation_status: string;
-    carpooling: boolean;
-    meeting_time?: Date;
-    meeting_comment?: string;
-};
 
 const ECO_FUELS = ["Hybride", "Electrique"];
 

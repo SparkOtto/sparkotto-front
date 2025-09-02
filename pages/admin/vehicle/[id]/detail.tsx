@@ -3,23 +3,7 @@ import Layout from '../../../../components/Layout';
 import { Button, Container, Row, Col, Spinner, Card, Form, Alert } from 'react-bootstrap';
 import { useRouter } from 'next/router';
 import { FaArrowLeft } from 'react-icons/fa';
-
-type Vehicle = {
-    id: string;
-    brand: string;
-    model: string;
-    license_plate: string;
-    mileage: number;
-    seat_count?: number;
-    fuel_capacity?: number;
-    transmissionId?: number;
-    fuelTypeId?: number;
-    agency_id?: number;
-    available?: boolean;
-    fuel_type?: { id_fuel: number; fuel_name: string };
-    transmission?: { id_transmission: number; transmission_type: string };
-    agency?: { id_agency: number; city: string };
-};
+import { Vehicle }  from '../../../../components/Interface';
 
 export default function VehicleDetail() {
     const router = useRouter();

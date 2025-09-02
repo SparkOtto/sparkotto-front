@@ -4,51 +4,8 @@ import { Card, Button, Row, Col, Badge, Container, Stack } from "react-bootstrap
 import { ToastContainer, toast } from "react-toastify";
 import { FaLeaf, FaCar, FaUsers, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import { Modal, Form } from "react-bootstrap";
-
-type Vehicle = {
-    id_vehicle: number;
-    brand: string;
-    model: string;
-    fuel_type: { fuel_name: string };
-    fuelTypeId: number;
-    license_plate: string;
-    mileage: number;
-    seat_count: number;
-    agency_id: number;
-    available: boolean;
-    fuel_capacity?: number;
-    transmission: { transmission_type: string };
-    transmissionId: number;
-    reservedSeats: number;
-    image?: string;
-    trips: Trip[];
-};
-
-type Trip = {
-    id_trip: number;
-    id_used_key: number;
-    id_vehicle: number;
-    id_driver: number;
-    start_date: Date;
-    end_date: Date;
-    departure_agency: number;
-    arrival_agency: number;
-    reservation_status: string;
-    carpooling: boolean;
-    carpoolings: string[];
-    meeting_time?: Date;
-    meeting_comment?: string;
-};
-
-type Agency = {
-    id_agency: number;
-    city: string;
-    postal_code: number;
-    street: string;
-    additional_info?: string;
-    phone: string;
-    head_office: boolean;
-};
+import Cookies from 'js-cookie';
+import { Vehicle, Trip, Key, Agency }  from '../../components/Interface';
 
 const ECO_FUELS = ["Hybride", "Electrique"];
 
@@ -221,7 +178,7 @@ const VehicleReservationPage: React.FC = () => {
         });
     };
 
-    const handleFormSubmit = (e: React.FormEvent) => {
+    const handleFormSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
             await sendReservation(reservationInfo);
@@ -234,19 +191,24 @@ const VehicleReservationPage: React.FC = () => {
     const sendReservation = async (info: typeof reservationInfo) => {
         if (!selectedVehicle) return;
 
+        const userCookie = Cookies.get('user');
+
+        console.log(selectedVehicle.keys);
+
         const payload = {
+            id_used_key: selectedVehicle.keys[0].id_key,
             id_vehicle: selectedVehicle.id_vehicle,
+            id_driver: userCookie ? JSON.parse(userCookie).id : null,
             start_date: info.startDate,
             end_date: info.endDate,
-            comment: info.comment,
-            etat_interieur: info.etatInterieur,
-            etat_exterieur: info.etatExterieur,
             departure_agency: info.departureAgency,
             arrival_agency: info.arrivalAgency,
+            reservation_status: "pending",
+            carpooling: true,
         };
 
         try {
-            const response = await fetch(`${process.env.backendAPI}/api/reservations`, {
+            const response = await fetch(`${process.env.backendAPI}/api/trip`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {

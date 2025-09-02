@@ -3,16 +3,7 @@ import Layout from '../../../../components/Layout';
 import { Button, Container, Row, Col, Spinner, Card, Form, Alert } from 'react-bootstrap';
 import { useRouter } from 'next/router';
 import { FaArrowLeft } from 'react-icons/fa';
-
-type Agency = {
-    id_agency: string;
-    city: string;
-    postal_code: number;
-    street: string;
-    additional_info?: string;
-    phone: string;
-    head_office: string | boolean | number;
-};
+import { Agency }  from '../../../../components/Interface';
 
 export default function AgencyDetail() {
     const router = useRouter();
