@@ -6,6 +6,7 @@ import { FaLeaf, FaCar, FaUsers, FaCheckCircle, FaTimesCircle } from "react-icon
 import { Modal, Form } from "react-bootstrap";
 import Cookies from 'js-cookie';
 import { Vehicle, Trip, Key, Agency }  from '../../components/Interface';
+import { TRIP_STATUS_LABELS }  from '../../components/ReservationStatus';
 
 const ECO_FUELS = ["Hybride", "Electrique"];
 
@@ -116,7 +117,7 @@ const VehicleReservationPage: React.FC = () => {
             return "pending";
         }
         if (ongoingTrip) {
-            if (ongoingTrip.carpoolings && vehicle.seat_count - ongoingTrip.carpoolings.length > 0) {
+            if (ongoingTrip.carpooling) {
                 return "covoiturage";
             }
             return "indisponible";

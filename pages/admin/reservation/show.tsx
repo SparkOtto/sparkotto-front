@@ -25,6 +25,7 @@ import {
 } from "react-icons/fa";
 
 import { Vehicle, Trip }  from '../../../components/Interface';
+import { TRIP_STATUS_LABELS }  from '../../../components/ReservationStatus';
 
 
 const ECO_FUELS = ["Hybride", "Electrique"];
@@ -152,8 +153,26 @@ const VehicleAdminDashboard: React.FC = () => {
     };
 
     const handleValidateReservation = (reservation: Trip) => {
-        // TODO: Call API to validate
-        toast.success(`Réservation validée pour`);
+        fetch(`${process.env.backendAPI}/api/trip/${reservation.id_trip}`, {
+            method: "PUT",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ reservation_status: "confirmed" }),
+        })
+            .then(async (response) => {
+                if (!response.ok) {
+                    const data = await response.json();
+                    toast.error(data.message || "Erreur lors de la validation.");
+                } else {
+                    toast.success("Réservation validée !");
+                    loadData();
+                }
+            })
+            .catch(() => {
+                toast.error("Erreur lors de la validation.");
+            });
     };
 
     const handleRefuseReservation = (reservation: Trip) => {
@@ -207,73 +226,6 @@ const VehicleAdminDashboard: React.FC = () => {
                         </Card>
                     </Col>
                 </Row>
-                {/* Vehicles Table */}
-                <Card className="mb-4 shadow-sm">
-                    <Card.Header className="d-flex justify-content-between align-items-center">
-                        <span className="fw-bold">Liste des véhicules</span>
-                        <Button variant="outline-secondary" size="sm" onClick={loadData}>
-                            <FaSyncAlt />
-                        </Button>
-                    </Card.Header>
-                    <Card.Body className="p-0">
-                        {loading ? (
-                            <div className="text-center py-5">
-                                <Spinner animation="border" />
-                            </div>
-                        ) : (
-                            <Table responsive hover className="mb-0 align-middle">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th></th>
-                                        <th>Marque/Modèle</th>
-                                        <th>Immatriculation</th>
-                                        <th>Carburant</th>
-                                        <th>Transmission</th>
-                                        <th>Places</th>
-                                        <th>Kilométrage</th>
-                                        <th>Statut</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {vehicles.map((vehicle, idx) => (
-                                        <tr key={vehicle.id_vehicle}>
-                                            <td>{idx + 1}</td>
-                                            <td>
-                                                {vehicle.image ? (
-                                                    <img
-                                                        src={vehicle.image}
-                                                        alt=""
-                                                        style={{
-                                                            width: 60,
-                                                            height: 40,
-                                                            objectFit: "cover",
-                                                            borderRadius: 4,
-                                                        }}
-                                                    />
-                                                ) : (
-                                                    <FaCar size={24} />
-                                                )}
-                                            </td>
-                                            <td>
-                                                {renderEcoBadge(vehicle)}
-                                                <b>
-                                                    {vehicle.brand} {vehicle.model}
-                                                </b>
-                                            </td>
-                                            <td>{vehicle.license_plate}</td>
-                                            <td>{vehicle.fuel_type.fuel_name}</td>
-                                            <td>{vehicle.transmission.transmission_type}</td>
-                                            <td>{vehicle.seat_count}</td>
-                                            <td>{vehicle.mileage} km</td>
-                                            <td>{renderStatus(vehicle)}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </Table>
-                        )}
-                    </Card.Body>
-                </Card>
                 {/* Reservations Table */}
                 <Card className="mb-4 shadow-sm">
                     <Card.Header className="fw-bold">Demandes de réservation</Card.Header>
@@ -370,9 +322,9 @@ const VehicleAdminDashboard: React.FC = () => {
                                                                         ? "secondary"
                                                                         : "warning"
                                                         }
-                                                        text={res.reservation_status === "en attente" ? "dark" : undefined}
+                                                        text={res.reservation_status === "pending" ? "dark" : undefined}
                                                     >
-                                                        {res.reservation_status}
+                                                        {TRIP_STATUS_LABELS[res.reservation_status]}
                                                     </Badge>
                                                 </td>
                                                 <td>
@@ -384,7 +336,7 @@ const VehicleAdminDashboard: React.FC = () => {
                                                         >
                                                             <FaEye />
                                                         </Button>
-                                                        {res.reservation_status === "en attente" && (
+                                                        {res.reservation_status === "pending" && (
                                                             <>
                                                                 <Button
                                                                     size="sm"
@@ -451,7 +403,7 @@ const VehicleAdminDashboard: React.FC = () => {
                                     }
                                     text={selectedReservation.reservation_status === "pending" ? "dark" : undefined}
                                 >
-                                    {selectedReservation.reservation_status}
+                                    {TRIP_STATUS_LABELS[selectedReservation.reservation_status]}
                                 </Badge>
                             </p>
                             {selectedReservation.departure_agency && (
