@@ -19,6 +19,18 @@ export type Vehicle = {
     keys: Key[];
 };
 
+export type User = {
+    id_user: number;
+    first_name: string;
+    last_name: string;
+    email: string;
+    phone_number: string;
+    agency_id: number;
+    agency: Agency;
+    active: boolean;
+    deactivation_date: Date;
+}
+
 export type Trip = {
     id_trip: number;
     id_used_key: number;
@@ -33,6 +45,9 @@ export type Trip = {
     carpoolings: string[];
     meeting_time?: Date;
     meeting_comment?: string;
+    driver: User;
+    agency_departure: Agency;
+    agency_arrival: Agency;
 };
 
 export type Key = {

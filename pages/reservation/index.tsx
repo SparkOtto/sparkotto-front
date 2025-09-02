@@ -108,6 +108,13 @@ const VehicleReservationPage: React.FC = () => {
         if (!vehicle.available) {
             return "indisponible";
         }
+        const pendingTrip = trips.find(
+            (trip) =>
+                trip.reservation_status === "pending"
+        );
+        if (pendingTrip) {
+            return "pending";
+        }
         if (ongoingTrip) {
             if (ongoingTrip.carpoolings && vehicle.seat_count - ongoingTrip.carpoolings.length > 0) {
                 return "covoiturage";
@@ -137,6 +144,8 @@ const VehicleReservationPage: React.FC = () => {
                 return <Badge bg="success"><FaCheckCircle className="me-1" />Disponible</Badge>;
             case "covoiturage":
                 return <Badge bg="warning"><FaUsers className="me-1" />Covoiturage</Badge>;
+            case "pending":
+                return <Badge bg="warning"><FaUsers className="me-1" />En attente</Badge>;
             default:
                 return <Badge bg="danger"><FaTimesCircle className="me-1" />Indisponible</Badge>;
         }
@@ -145,6 +154,10 @@ const VehicleReservationPage: React.FC = () => {
     const handleReserve = (vehicle: Vehicle) => {
         if (getStatus(vehicle) === "indisponible") {
             toast.error("Ce véhicule est indisponible pour le moment.");
+            return;
+        }
+        if (getStatus(vehicle) === "pending") {
+            toast.error("Ce véhicule est en attente.");
             return;
         }
         if (getStatus(vehicle) === "covoiturage") {
@@ -198,14 +211,16 @@ const VehicleReservationPage: React.FC = () => {
         const payload = {
             id_used_key: selectedVehicle.keys[0].id_key,
             id_vehicle: selectedVehicle.id_vehicle,
-            id_driver: userCookie ? JSON.parse(userCookie).id : null,
-            start_date: info.startDate,
-            end_date: info.endDate,
-            departure_agency: info.departureAgency,
-            arrival_agency: info.arrivalAgency,
+            id_driver: userCookie ? Number(JSON.parse(userCookie).id) : null,
+            start_date: new Date(info.startDate),
+            end_date: new Date(info.endDate),
+            departure_agency: Number(info.departureAgency),
+            arrival_agency: Number(info.arrivalAgency),
             reservation_status: "pending",
             carpooling: true,
         };
+
+        console.log(payload);
 
         try {
             const response = await fetch(`${process.env.backendAPI}/api/trip`, {
@@ -220,6 +235,7 @@ const VehicleReservationPage: React.FC = () => {
             if (!response.ok) {
                 const data = await response.json();
                 if (response.status === 400) {
+                    console.log(data);
                     toast.error(`Erreur de validation: ${data.message}`);
                 } else if (response.status === 500) {
                     toast.error(`Erreur serveur: ${data.message}`);
@@ -325,7 +341,7 @@ const VehicleReservationPage: React.FC = () => {
                                     </div>
                                 </Card.Body>
                                 <Card.Footer className="bg-white border-0">
-                                    {getStatus(vehicle) !== "indisponible" ? (
+                                    {getStatus(vehicle) !== "indisponible" && getStatus(vehicle) !== "pending" ? (
                                         <Button
                                             variant="primary"
                                             onClick={() => handleReserve(vehicle)}
@@ -338,7 +354,9 @@ const VehicleReservationPage: React.FC = () => {
                                         </Button>
                                     ) : (
                                         <Button variant="secondary" disabled className="w-100">
-                                            Indisponible
+                                            {getStatus(vehicle) === "pending"
+                                                ? "En attente"
+                                                : "Indisponible"}
                                         </Button>
                                     )}
                                 </Card.Footer>
