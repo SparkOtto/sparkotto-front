@@ -13,7 +13,6 @@ export default function Dashboard() {
     const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
 
     useEffect(() => {
-        // Remplacez 'id-user' par l'ID utilisateur réel si nécessaire
         fetch(`${process.env.backendAPI}/api/trip/my/${userId}`,
             {
                 method: 'GET',
