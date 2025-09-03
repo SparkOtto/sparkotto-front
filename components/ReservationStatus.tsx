@@ -4,7 +4,9 @@ export const TRIP_STATUS = {
     IN_PROGRESS: 'in_progress',
     COMPLETED: 'completed',
     CANCELLED: 'cancelled',
-    NO_SHOW: 'no_show'
+    NO_SHOW: 'no_show',
+    AVAILABLE: 'available',
+    UNAVAILABLE: 'unavailable'
 };
 
 export const TRIP_STATUS_LABELS: Record<string, string> = {
@@ -13,7 +15,9 @@ export const TRIP_STATUS_LABELS: Record<string, string> = {
     [TRIP_STATUS.IN_PROGRESS]: "En cours",
     [TRIP_STATUS.COMPLETED]: "Terminé",
     [TRIP_STATUS.CANCELLED]: "Annulé",
-    [TRIP_STATUS.NO_SHOW]: "Non présenté"
+    [TRIP_STATUS.NO_SHOW]: "Non présenté",
+    [TRIP_STATUS.AVAILABLE]: "Disponible",
+    [TRIP_STATUS.UNAVAILABLE]: "Indisponible"
 };
 
 // Utilisation :

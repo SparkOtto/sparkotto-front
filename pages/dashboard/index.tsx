@@ -128,7 +128,7 @@ export default function Dashboard() {
                         <Row className="g-4">
                             {trips.filter(trip =>
                                 (trip.reservation_status === 'pending' || trip.reservation_status === 'confirmed') &&
-                                new Date(trip.start_date) > new Date()
+                                new Date(trip.start_date) > new Date() 
                             ).length === 0 ? (
                                 <div>Aucun trajet à venir.</div>
                             ) : (
@@ -177,8 +177,21 @@ export default function Dashboard() {
                                                             <div className="fw-bold">{trip.vehicle?.license_plate || 'N/A'}</div>
                                                         </Col>
                                                     </Row>
+                                                    <div className="mb-2">
+                                                        <span
+                                                            className={`badge rounded-pill text-uppercase ${
+                                                                trip.reservation_status === 'pending'
+                                                                    ? 'bg-warning text-dark'
+                                                                    : trip.reservation_status === 'confirmed'
+                                                                    ? 'bg-success'
+                                                                    : 'bg-info text-dark'
+                                                            }`}
+                                                        >
+                                                            {trip.reservation_status}
+                                                        </span>
+                                                    </div>
                                                     <div className="mb-3">
-                                                        <span className={`badge rounded-pill ${trip.vehicle && typeof trip.vehicle.seat_count === 'number' && (trip.vehicle.seat_count - 1 - trip.carpoolings.length) > 0 ? 'bg-success' : 'bg-danger'}`}>
+                                                        <span className={`badge rounded-pill ${trip.vehicle && typeof trip.vehicle.seat_count === 'number' && (trip.vehicle.seat_count - 1 - trip.carpoolings.length) > 0 ? 'bg-primary' : 'bg-danger'}`}>
                                                             {trip.vehicle && typeof trip.vehicle.seat_count === 'number'
                                                                 ? `${trip.vehicle.seat_count - 1 - trip.carpoolings.length} places libres`
                                                                 : 'Complet'}
@@ -204,16 +217,16 @@ export default function Dashboard() {
                         <Row className="g-4">
                             {trips.filter(trip =>
                                 trip.reservation_status === 'confirmed' &&
-                                new Date(trip.start_date) <= new Date() &&
-                                new Date(trip.end_date) >= new Date()
+                                new Date(trip.start_date) >= new Date() 
+                                
                             ).length === 0 ? (
                                 <div>Aucun trajet en cours.</div>
                             ) : (
                                 trips
                                     .filter(trip =>
                                         trip.reservation_status === 'confirmed' &&
-                                        new Date(trip.start_date) <= new Date() &&
-                                        new Date(trip.end_date) >= new Date()
+                                        new Date(trip.start_date) >= new Date()
+                                        
                                     )
                                     .map((trip) => (
                                         <Col key={trip.id_trip} xs={12} md={4} lg={4}>
@@ -278,15 +291,15 @@ export default function Dashboard() {
                     ) : (
                         <Row className="g-4">
                             {trips.filter(trip => 
-                                trip.reservation_status === 'completed' ||
-                                new Date(trip.end_date) < new Date()
+                                trip.reservation_status === 'completed' &&
+                                new Date(trip.end_date) > new Date()
                             ).length === 0 ? (
                                 <div>Aucun trajet passé.</div>
                             ) : (
                                 trips
                                     .filter(trip => 
-                                        trip.reservation_status === 'completed' ||
-                                        new Date(trip.end_date) < new Date()
+                                        trip.reservation_status === 'completed' &&
+                                        new Date(trip.end_date) > new Date()
                                     )
                                     .map((trip) => (
                                         <Col key={trip.id_trip} xs={12} md={4} lg={4}>
