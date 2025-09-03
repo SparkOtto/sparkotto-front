@@ -4,12 +4,6 @@ import Layout from '../../components/Layout';
 import { Card, Button, Form, Row, Col } from 'react-bootstrap';
 import { Trip } from '../../components/Interface';
 import Cookies from 'js-cookie';
-import 'leaflet/dist/leaflet.css';
-import { MapContainer, TileLayer } from 'react-leaflet';
-import L from 'leaflet';
-import { useMap } from "react-leaflet";
-import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
-import "leaflet-routing-machine";
 
 export default function Dashboard() {
     const [trips, setTrips] = useState<Trip[]>([]);
@@ -18,12 +12,8 @@ export default function Dashboard() {
     const userId = userCookie ? Number(JSON.parse(userCookie).id) : null;
     const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
 
-    // Utilisation dans votre composant principal :
-    const start = { lat: 48.86, lng: 2.35 }; // Paris
-    const end = { lat: 48.853, lng: 2.3498 }; // Paris Notre-Dame
-    const map = useMap();
-
     useEffect(() => {
+        // Remplacez 'id-user' par l'ID utilisateur réel si nécessaire
         fetch(`${process.env.backendAPI}/api/trip/my/${userId}`,
             {
                 method: 'GET',
@@ -33,10 +23,11 @@ export default function Dashboard() {
                 },
             }
         )
-        .then(res => res.json())
-        .then(data => setTrips(data))
-        .catch(() => setTrips([]));
-    });
+            .then(res => res.json())
+            .then(data => setTrips(data))
+            .catch(() => setTrips([]))
+            .finally(() => setLoading(false));
+    }, []);
 
     const handleTripSelect = (trip: Trip) => {
         setSelectedTrip(trip);
@@ -68,12 +59,7 @@ export default function Dashboard() {
                                     </div>
                                     <div className="modal-body">
                                         <div className="d-flex align-items-center justify-content-center bg-light border rounded w-100" style={{ minHeight: 300 }}>
-                                            <MapContainer center={[48.86, 2.35]} zoom={13} style={{ height: "500px", width: "100%" }}>
-                                                <TileLayer
-                                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                                    attribution='&copy; OpenStreetMap contributors'
-                                                />
-                                            </MapContainer>
+                                            <span>Carte du trajet à afficher ici</span>
                                         </div>
                                     </div>
                                     <div className="modal-footer">
@@ -244,14 +230,14 @@ export default function Dashboard() {
                         <div>Chargement...</div>
                     ) : (
                         <Row className="g-4">
-                            {trips.filter(trip =>
+                            {trips.filter(trip => 
                                 trip.reservation_status === 'completed' ||
                                 new Date(trip.end_date) < new Date()
                             ).length === 0 ? (
                                 <div>Aucun trajet passé.</div>
                             ) : (
                                 trips
-                                    .filter(trip =>
+                                    .filter(trip => 
                                         trip.reservation_status === 'completed' ||
                                         new Date(trip.end_date) < new Date()
                                     )
