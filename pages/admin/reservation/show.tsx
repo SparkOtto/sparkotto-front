@@ -166,7 +166,7 @@ const VehicleAdminDashboard: React.FC = () => {
                     const data = await response.json();
                     toast.error(data.message || "Erreur lors de la validation.");
                 } else {
-                    toast.success("Réservation validée !");
+                    toast.success("Réservation confirmed !");
                     loadData();
                 }
             })
@@ -176,8 +176,26 @@ const VehicleAdminDashboard: React.FC = () => {
     };
 
     const handleRefuseReservation = (reservation: Trip) => {
-        // TODO: Call API to refuse
-        toast.error(`Réservation refusée pour`);
+        fetch(`${process.env.backendAPI}/api/trip/${reservation.id_trip}`, {
+            method: "PUT",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ reservation_status: "cancelled" }),
+        })
+            .then(async (response) => {
+                if (!response.ok) {
+                    const data = await response.json();
+                    toast.error(data.message || "Erreur lors du refus.");
+                } else {
+                    toast.error("Réservation cancelled !");
+                    loadData();
+                }
+            })
+            .catch(() => {
+                toast.error("Erreur lors du refus.");
+            });
     };
 
     return (
@@ -314,11 +332,11 @@ const VehicleAdminDashboard: React.FC = () => {
                                                 <td>
                                                     <Badge
                                                         bg={
-                                                            res.reservation_status === "validée"
+                                                            res.reservation_status === "confirmed"
                                                                 ? "success"
-                                                                : res.reservation_status === "refusée"
+                                                                : res.reservation_status === "cancelled"
                                                                     ? "danger"
-                                                                    : res.reservation_status === "terminée"
+                                                                    : res.reservation_status === "completed"
                                                                         ? "secondary"
                                                                         : "warning"
                                                         }
@@ -395,9 +413,9 @@ const VehicleAdminDashboard: React.FC = () => {
                                     bg={
                                         selectedReservation.reservation_status === "confirmed"
                                             ? "success"
-                                            : selectedReservation.reservation_status === "refusée"
+                                            : selectedReservation.reservation_status === "cancelled"
                                                 ? "danger"
-                                                : selectedReservation.reservation_status === "terminée"
+                                                : selectedReservation.reservation_status === "completed"
                                                     ? "secondary"
                                                     : "warning"
                                     }

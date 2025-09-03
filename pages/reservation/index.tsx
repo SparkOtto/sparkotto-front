@@ -207,8 +207,6 @@ const VehicleReservationPage: React.FC = () => {
 
         const userCookie = Cookies.get('user');
 
-        console.log(selectedVehicle.keys);
-
         const payload = {
             id_used_key: selectedVehicle.keys[0].id_key,
             id_vehicle: selectedVehicle.id_vehicle,
@@ -244,11 +242,29 @@ const VehicleReservationPage: React.FC = () => {
                     toast.error('Erreur inconnue lors de la réservation.');
                 }
             } else {
-                toast.success('Réservation envoyée avec succès !');
-                // Optionally refresh vehicle list to reflect new reservation
-                const fetchedVehicles = await fetchVehicles();
-                if (fetchedVehicles) {
-                    setVehicles(fetchedVehicles);
+                const vehicleCleanlinessState = await fetch(`${process.env.backendAPI}/api/vehicleState`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        id_vehicle: selectedVehicle.id_vehicle,
+                        state_type: 'departure',
+                        internal_cleanliness: reservationInfo.etatInterieur,
+                        external_cleanliness: reservationInfo.etatExterieur,
+                        comment: reservationInfo.comment,
+                    }),
+                });
+                if (!vehicleCleanlinessState.ok) {
+                    const data = await vehicleCleanlinessState.json();
+                    toast.error(`Erreur lors de la mise à jour de l'état du véhicule: ${data.message}`);
+                } else {
+                    toast.success('Réservation envoyée avec succès !');
+                    const fetchedVehicles = await fetchVehicles();
+                    if (fetchedVehicles) {
+                        setVehicles(fetchedVehicles);
+                    }
                 }
             }
         } catch (error) {
@@ -401,20 +417,6 @@ const VehicleReservationPage: React.FC = () => {
                                 </Form.Group>
                             </Col>
                             <Col md={6}>
-                                <Form.Group controlId="reservationStartDate">
-                                    <Form.Label>Date de début</Form.Label>
-                                    <Form.Control
-                                        type="datetime-local"
-                                        name="startDate"
-                                        value={reservationInfo.startDate}
-                                        onChange={handleFormChange}
-                                        required
-                                    />
-                                </Form.Group>
-                            </Col>
-                        </Row>
-                        <Row className="mb-3">
-                            <Col md={6}>
                                 <Form.Group controlId="reservationArrivalAgency">
                                     <Form.Label>Agence d'arrivée</Form.Label>
                                     <Form.Select
@@ -435,6 +437,20 @@ const VehicleReservationPage: React.FC = () => {
                                             </option>
                                         ))}
                                     </Form.Select>
+                                </Form.Group>
+                            </Col>
+                        </Row>
+                        <Row className="mb-3">
+                            <Col md={6}>
+                                <Form.Group controlId="reservationStartDate">
+                                    <Form.Label>Date de début</Form.Label>
+                                    <Form.Control
+                                        type="datetime-local"
+                                        name="startDate"
+                                        value={reservationInfo.startDate}
+                                        onChange={handleFormChange}
+                                        required
+                                    />
                                 </Form.Group>
                             </Col>
                             <Col md={6}>

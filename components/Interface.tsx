@@ -48,6 +48,7 @@ export type Trip = {
     driver: User;
     agency_departure: Agency;
     agency_arrival: Agency;
+    vehicle: Vehicle;
 };
 
 export type Key = {
