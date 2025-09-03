@@ -31,6 +31,13 @@ export type User = {
     deactivation_date: Date;
 }
 
+export type Carpooling = {
+    id_carpooling: number;
+    id_trip: number;
+    id_passenger: number;
+    passenger: User;
+};
+
 export type Trip = {
     id_trip: number;
     id_used_key: number;
@@ -42,7 +49,7 @@ export type Trip = {
     arrival_agency: number;
     reservation_status: string;
     carpooling: boolean;
-    carpoolings: string[];
+    carpoolings: Carpooling[];
     meeting_time?: Date;
     meeting_comment?: string;
     driver: User;

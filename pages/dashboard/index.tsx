@@ -2,8 +2,13 @@
 import React, { useEffect, useState } from 'react';
 import Layout from '../../components/Layout';
 import { Card, Button, Form, Row, Col } from 'react-bootstrap';
-import { Trip } from '../../components/Interface';
+import { Trip, Carpooling } from '../../components/Interface';
+import dynamic from "next/dynamic";
 import Cookies from 'js-cookie';
+
+const Map = dynamic(() => import('../../components/MapTrip/Map'), {
+    ssr: false
+});
 
 export default function Dashboard() {
     const [trips, setTrips] = useState<Trip[]>([]);
@@ -43,7 +48,7 @@ export default function Dashboard() {
                             tabIndex={-1}
                             role="dialog"
                         >
-                            <div className="modal-dialog modal-lg" role="document">
+                            <div className="modal-dialog modal-xl" role="document">
                                 <div className="modal-content">
                                     <div className="modal-header">
                                         <h5 className="modal-title">
@@ -57,8 +62,51 @@ export default function Dashboard() {
                                         />
                                     </div>
                                     <div className="modal-body">
-                                        <div className="d-flex align-items-center justify-content-center bg-light border rounded w-100" style={{ minHeight: 300 }}>
-                                            <span>Carte du trajet à afficher ici</span>
+                                        <div className="row">
+                                            {/* Carte à gauche */}
+                                            <div className="col-md-9 d-flex align-items-center justify-content-center mb-3 mb-md-0">
+                                                <div className="w-100 bg-light border rounded" style={{ minHeight: 350 }}>
+                                                    <Map
+                                                        originAddress={selectedTrip.agency_departure.street}
+                                                        originPostalCode={selectedTrip.agency_departure.postal_code}
+                                                        destinationAddress={selectedTrip.agency_arrival.street}
+                                                        destinationPostalCode={selectedTrip.agency_arrival.postal_code}
+                                                    />
+                                                </div>
+                                            </div>
+                                            {/* Passagers et conducteur à droite */}
+                                            <div className="col-md-3">
+                                                <div className="mb-4">
+                                                    <h6 className="fw-bold mb-2">Conducteur :</h6>
+                                                    <div className="d-flex align-items-center border rounded p-2 bg-white mb-3">
+                                                        <span className="me-2">
+                                                            <i className="bi bi-person-badge fs-4 text-primary"></i>
+                                                        </span>
+                                                        <span>
+                                                            {selectedTrip.driver?.first_name} {selectedTrip.driver?.last_name}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <h6 className="fw-bold mb-2">Passagers :</h6>
+                                                    {selectedTrip.carpoolings && selectedTrip.carpoolings.length > 0 ? (
+                                                        <ul className="list-group">
+                                                            {selectedTrip.carpoolings.map((carpooling, idx) => (
+                                                                <li key={carpooling.id_carpooling || idx} className="list-group-item d-flex align-items-center">
+                                                                    <span className="me-2">
+                                                                        <i className="bi bi-person-circle"></i>
+                                                                    </span>
+                                                                    <span>
+                                                                        {carpooling.passenger?.first_name} {carpooling.passenger?.last_name}
+                                                                    </span>
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    ) : (
+                                                        <div className="text-muted">Aucun passager pour ce trajet.</div>
+                                                    )}
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="modal-footer">
