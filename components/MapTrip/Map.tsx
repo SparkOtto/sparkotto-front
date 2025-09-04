@@ -43,9 +43,6 @@ const Map: React.FC<MapProps> = ({ originAddress, originPostalCode, destinationA
 
       const destinationCoords = await geocode(destinationAddress, destinationPostalCode);
       setDestination(destinationCoords);
-
-      console.log("Origin:", originCoords);
-      console.log("Destination:", destinationCoords);
     }
 
     fetchCoordinates().catch(console.error);

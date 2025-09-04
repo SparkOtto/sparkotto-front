@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import Layout from "../../components/Layout";
 import { Card, Button, Row, Col, Badge, Container, Stack } from "react-bootstrap";
 import { ToastContainer, toast } from "react-toastify";
-import { FaLeaf, FaUsers, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import { FaLeaf, FaCar, FaUsers, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import { Modal, Form } from "react-bootstrap";
 import Cookies from 'js-cookie';
-import { Vehicle, Trip, Key, Agency }  from '../../components/Interface';
+import { Vehicle, Agency }  from '../../components/Interface';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { fr } from 'date-fns/locale';
@@ -64,11 +64,11 @@ const fetchAgencies = async (): Promise<Agency[]> => {
 };
 
 function getDatesBetween(start: Date, end: Date): Date[] {
-  const dates = [];
-  const current = new Date(start);
-  while (current <= end) {
-    dates.push(new Date(current));
-    current.setDate(current.getDate() + 1);
+    const dates = [];
+    const current = new Date(start);
+    while (current <= end) {
+        dates.push(new Date(current));
+        current.setDate(current.getDate() + 1);
   }
   return dates;
 }
@@ -77,6 +77,7 @@ const VehicleReservationPage: React.FC = () => {
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
+    const [agencies, setAgencies] = useState<Agency[]>([]);
     const [reservationInfo, setReservationInfo] = useState({
         startDate: null as Date | null,
         endDate: null as Date | null,
@@ -104,7 +105,6 @@ const VehicleReservationPage: React.FC = () => {
         ).map(trip => ({ ...trip, vehicle }))
     );
 
-    const [agencies, setAgencies] = useState<Agency[]>([]);
 
     useEffect(() => {
         // Fetch vehicles
@@ -437,13 +437,12 @@ const VehicleReservationPage: React.FC = () => {
                                             {/* Affichage du nombre de places restantes */}
                                             <div className="mb-1">
                                                 <b>Places restantes:</b>{" "}
-                                                {vehicle.seat_count - 1 - (carpoolTrips.find(t => t.id_trip === id_trip)?.carpoolings?.length || 0)} / {vehicle.seat_count - 1} {/* 1 place pour le conducteur */}
+                                                {vehicle.seat_count - 1 - (vehicle.trips?.find(t => t.id_trip === id_trip)?.carpoolings?.length)}
                                             </div>
                                         </Card.Body>
                                         <Card.Footer className="bg-white border-0">
                                             {(() => {
                                                 const trip = vehicle.trips?.find(t => t.id_trip === id_trip);
-                                                console.log("Trip:", trip);
                                                 const maxSeats = vehicle.seat_count - 1; // 1 seat for driver
                                                 const currentPassengers = trip?.carpoolings?.length || 0;
                                                 const isFull = currentPassengers >= maxSeats;

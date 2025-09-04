@@ -8,6 +8,8 @@ import Logo from './Logo';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
+const LogoMemo = React.memo(Logo);
+
 export default function Sidebar() {
   const [show, setShow] = useState(false);
 
@@ -20,7 +22,7 @@ export default function Sidebar() {
     <>
       <div className="text-center mb-4">
         <Link href="/" className="text-decoration-none text-white">
-            <Logo />
+            <LogoMemo />
         </Link>
       </div>
       <Nav className="flex-column">
