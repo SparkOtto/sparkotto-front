@@ -107,19 +107,6 @@ const VehicleAdminDashboard: React.FC = () => {
         return "indisponible";
     };
 
-    // Dashboard stats
-    const total = vehicles.length;
-    const available = vehicles.filter((v) => getStatus(v) === "disponible").length;
-    const carpool = vehicles.filter((v) => getStatus(v) === "covoiturage").length;
-    const unavailable = vehicles.filter((v) => getStatus(v) === "indisponible").length;
-
-    const renderEcoBadge = (vehicle: Vehicle) =>
-        ECO_FUELS.includes(vehicle.fuel_type.fuel_name) ? (
-            <Badge bg="success" className="me-2">
-                <FaLeaf />
-            </Badge>
-        ) : null;
-
     const renderStatus = (vehicle: Vehicle) => {
         const status = getStatus(vehicle);
         switch (status) {
@@ -205,45 +192,6 @@ const VehicleAdminDashboard: React.FC = () => {
                 <div className="mb-4 d-flex align-items-center justify-content-between">
                     <h2 className="fw-bold mb-0">Gestion des demandes de réservation</h2>
                 </div>
-                {/* Dashboard Stats */}
-                <Row className="mb-4 g-3">
-                    <Col xs={6} md={3}>
-                        <Card className="text-center shadow-sm border-0">
-                            <Card.Body>
-                                <FaCar size={28} className="mb-2 text-primary" />
-                                <h5 className="fw-bold">{total}</h5>
-                                <div className="text-muted">Véhicules</div>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                    <Col xs={6} md={3}>
-                        <Card className="text-center shadow-sm border-0">
-                            <Card.Body>
-                                <FaCheckCircle size={28} className="mb-2 text-success" />
-                                <h5 className="fw-bold">{available}</h5>
-                                <div className="text-muted">Disponibles</div>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                    <Col xs={6} md={3}>
-                        <Card className="text-center shadow-sm border-0">
-                            <Card.Body>
-                                <FaUsers size={28} className="mb-2 text-warning" />
-                                <h5 className="fw-bold">{carpool}</h5>
-                                <div className="text-muted">Covoiturage possible</div>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                    <Col xs={6} md={3}>
-                        <Card className="text-center shadow-sm border-0">
-                            <Card.Body>
-                                <FaTimesCircle size={28} className="mb-2 text-danger" />
-                                <h5 className="fw-bold">{unavailable}</h5>
-                                <div className="text-muted">Indisponibles</div>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                </Row>
                 {/* Reservations Table */}
                 <Card className="mb-4 shadow-sm">
                     <Card.Header className="fw-bold">Demandes de réservation</Card.Header>

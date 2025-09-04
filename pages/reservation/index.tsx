@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Layout from "../../components/Layout";
 import { Card, Button, Row, Col, Badge, Container, Stack } from "react-bootstrap";
 import { ToastContainer, toast } from "react-toastify";
-import { FaLeaf, FaCar, FaUsers, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import { FaLeaf, FaUsers, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import { Modal, Form } from "react-bootstrap";
 import Cookies from 'js-cookie';
 import { Vehicle, Trip, Key, Agency }  from '../../components/Interface';
@@ -434,15 +434,30 @@ const VehicleReservationPage: React.FC = () => {
                                             <div className="mb-1">
                                                 <b>Agence arrivée:</b> {agencies.find(a => a.id_agency === arrival_agency)?.city || arrival_agency}
                                             </div>
+                                            {/* Affichage du nombre de places restantes */}
+                                            <div className="mb-1">
+                                                <b>Places restantes:</b>{" "}
+                                                {vehicle.seat_count - 1 - (carpoolTrips.find(t => t.id_trip === id_trip)?.carpoolings?.length || 0)} / {vehicle.seat_count - 1} {/* 1 place pour le conducteur */}
+                                            </div>
                                         </Card.Body>
                                         <Card.Footer className="bg-white border-0">
-                                            <Button
-                                                variant="warning"
-                                                onClick={() => handleCarpooling(id_trip)}
-                                                className="w-100"
-                                            >
-                                                Rejoindre le covoiturage
-                                            </Button>
+                                            {(() => {
+                                                const trip = vehicle.trips?.find(t => t.id_trip === id_trip);
+                                                console.log("Trip:", trip);
+                                                const maxSeats = vehicle.seat_count - 1; // 1 seat for driver
+                                                const currentPassengers = trip?.carpoolings?.length || 0;
+                                                const isFull = currentPassengers >= maxSeats;
+                                                return (
+                                                    <Button
+                                                        variant="warning"
+                                                        onClick={() => !isFull && handleCarpooling(id_trip)}
+                                                        className="w-100"
+                                                        disabled={isFull}
+                                                    >
+                                                        {isFull ? "Covoiturage complet" : "Rejoindre le covoiturage"}
+                                                    </Button>
+                                                );
+                                            })()}
                                         </Card.Footer>
                                     </Card>
                                 </Col>
