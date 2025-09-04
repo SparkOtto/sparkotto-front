@@ -5,6 +5,7 @@ import { Card, Button, Form, Row, Col } from 'react-bootstrap';
 import { Trip, Carpooling } from '../../components/Interface';
 import dynamic from "next/dynamic";
 import Cookies from 'js-cookie';
+import { TRIP_STATUS_LABELS } from '../../components/ReservationStatus';
 
 const Map = dynamic(() => import('../../components/MapTrip/Map'), {
     ssr: false
@@ -128,27 +129,32 @@ export default function Dashboard() {
                         <Row className="g-4">
                             {trips.filter(trip =>
                                 (trip.reservation_status === 'pending' || trip.reservation_status === 'confirmed') &&
-                                new Date(trip.start_date) > new Date() 
+                                new Date() < new Date(trip.start_date)
                             ).length === 0 ? (
                                 <div>Aucun trajet à venir.</div>
                             ) : (
                                 trips
                                     .filter(trip =>
                                         (trip.reservation_status === 'pending' || trip.reservation_status === 'confirmed') &&
-                                        new Date(trip.start_date) > new Date()
+                                        new Date() < new Date(trip.start_date)
                                     )
                                     .map((trip) => (
                                         <Col key={trip.id_trip} xs={12} md={4} lg={4}>
                                             <Card className="h-100 shadow-sm border-0">
                                                 <Card.Body>
                                                     <div className="d-flex align-items-center mb-3">
-                                                        {/* Calendar style date with Bootstrap only */}
                                                         <div className="d-flex flex-column align-items-center justify-content-center border rounded bg-white p-2 me-3" style={{ minWidth: 60 }}>
                                                             <span className="fs-2 fw-bold text-primary">
                                                                 {new Date(trip.start_date).getDate()}
+                                                                {trip.end_date && new Date(trip.end_date).getDate() !== new Date(trip.start_date).getDate() && (
+                                                                    <> - {new Date(trip.end_date).getDate()}</>
+                                                                )}
                                                             </span>
                                                             <span className="text-uppercase text-secondary small">
                                                                 {new Date(trip.start_date).toLocaleString('fr-FR', { month: 'short' })}
+                                                                {trip.end_date && new Date(trip.end_date).getMonth() !== new Date(trip.start_date).getMonth() && (
+                                                                    <> - {new Date(trip.end_date).toLocaleString('fr-FR', { month: 'short' })}</>
+                                                                )}
                                                             </span>
                                                         </div>
                                                         <div>
@@ -187,7 +193,7 @@ export default function Dashboard() {
                                                                     : 'bg-info text-dark'
                                                             }`}
                                                         >
-                                                            {trip.reservation_status}
+                                                            {TRIP_STATUS_LABELS[trip.reservation_status]}
                                                         </span>
                                                     </div>
                                                     <div className="mb-3">
@@ -217,7 +223,8 @@ export default function Dashboard() {
                         <Row className="g-4">
                             {trips.filter(trip =>
                                 trip.reservation_status === 'confirmed' &&
-                                new Date(trip.start_date) >= new Date() 
+                                new Date() > new Date(trip.start_date) &&
+                                new Date() < new Date(trip.end_date)
                                 
                             ).length === 0 ? (
                                 <div>Aucun trajet en cours.</div>
@@ -225,8 +232,8 @@ export default function Dashboard() {
                                 trips
                                     .filter(trip =>
                                         trip.reservation_status === 'confirmed' &&
-                                        new Date(trip.start_date) >= new Date()
-                                        
+                                        new Date() > new Date(trip.start_date) &&
+                                        new Date() < new Date(trip.end_date)
                                     )
                                     .map((trip) => (
                                         <Col key={trip.id_trip} xs={12} md={4} lg={4}>
@@ -236,9 +243,15 @@ export default function Dashboard() {
                                                         <div className="d-flex flex-column align-items-center justify-content-center border rounded bg-white p-2 me-3" style={{ minWidth: 60 }}>
                                                             <span className="fs-2 fw-bold text-warning">
                                                                 {new Date(trip.start_date).getDate()}
+                                                                {trip.end_date && new Date(trip.end_date).getDate() !== new Date(trip.start_date).getDate() && (
+                                                                    <> - {new Date(trip.end_date).getDate()}</>
+                                                                )}
                                                             </span>
                                                             <span className="text-uppercase text-secondary small">
                                                                 {new Date(trip.start_date).toLocaleString('fr-FR', { month: 'short' })}
+                                                                {trip.end_date && new Date(trip.end_date).getMonth() !== new Date(trip.start_date).getMonth() && (
+                                                                    <> - {new Date(trip.end_date).toLocaleString('fr-FR', { month: 'short' })}</>
+                                                                )}
                                                             </span>
                                                         </div>
                                                         <div>
@@ -309,9 +322,15 @@ export default function Dashboard() {
                                                         <div className="d-flex flex-column align-items-center justify-content-center border rounded bg-white p-2 me-3" style={{ minWidth: 60 }}>
                                                             <span className="fs-2 fw-bold text-secondary">
                                                                 {new Date(trip.start_date).getDate()}
+                                                                {trip.end_date && new Date(trip.end_date).getDate() !== new Date(trip.start_date).getDate() && (
+                                                                    <> - {new Date(trip.end_date).getDate()}</>
+                                                                )}
                                                             </span>
                                                             <span className="text-uppercase text-secondary small">
                                                                 {new Date(trip.start_date).toLocaleString('fr-FR', { month: 'short' })}
+                                                                {trip.end_date && new Date(trip.end_date).getMonth() !== new Date(trip.start_date).getMonth() && (
+                                                                    <> - {new Date(trip.end_date).toLocaleString('fr-FR', { month: 'short' })}</>
+                                                                )}
                                                             </span>
                                                         </div>
                                                         <div>
@@ -345,7 +364,7 @@ export default function Dashboard() {
                                                             Trajet terminé
                                                         </span>
                                                     </div>
-                                                    <Button variant="outline-secondary" className="w-100" disabled>
+                                                    <Button variant="outline-secondary" className="w-100" onClick={() => setSelectedTrip(trip)}>
                                                         Voir le trajet
                                                     </Button>
                                                 </Card.Body>

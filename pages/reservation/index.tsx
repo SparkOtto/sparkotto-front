@@ -153,8 +153,6 @@ const VehicleReservationPage: React.FC = () => {
                 return <Badge bg="purple"><FaCheckCircle className="me-1" />Disponible</Badge>;
             case "unavailable":
                 return <Badge bg="secondary"><FaTimesCircle className="me-1" />Indisponible</Badge>;
-            case "pending":
-                return <Badge bg="warning"><FaUsers className="me-1" />En attente</Badge>;
             default:
                 return <Badge bg="secondary"><FaTimesCircle className="me-1" />Indisponible</Badge>;
         }
@@ -165,13 +163,28 @@ const VehicleReservationPage: React.FC = () => {
             toast.error("Ce véhicule est indisponible pour le moment.");
             return;
         }
-        if (getStatus(vehicle) === "pending") {
-            toast.error("Ce véhicule est en attente.");
-            return;
-        }
         if (getStatus(vehicle) === "available") {
             setSelectedVehicle(vehicle);
             setShowModal(true);
+        }
+    };
+
+    const handleCarpooling = async (id_trip : number) => {
+        const goCarpooling = await fetch(`${process.env.backendAPI}/api/carpooling`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ id_passenger: Number(JSON.parse(Cookies.get('user')).id), id_trip: id_trip }),
+        });
+
+        if (!goCarpooling.ok) {
+            const data = await goCarpooling.json();
+            toast.error(`Erreur : ${data.error}`);
+        } else {
+            toast.success('Vous avez rejoint le covoiturage avec succès !');
+            const fetchedVehicles = await fetchVehicles();
         }
     };
 
@@ -360,8 +373,6 @@ const VehicleReservationPage: React.FC = () => {
                                         variant={
                                             getStatus(vehicle) === "available"
                                                 ? "purple text-white"
-                                                : getStatus(vehicle) === "pending"
-                                                ? "warning"
                                                 : "secondary"
                                         }
                                         onClick={() => handleReserve(vehicle)}
@@ -370,8 +381,6 @@ const VehicleReservationPage: React.FC = () => {
                                     >
                                         {getStatus(vehicle) === "available"
                                             ? "Réserver"
-                                            : getStatus(vehicle) === "pending"
-                                            ? "En attente"
                                             : "Indisponible"}
                                     </Button>
                                 </Card.Footer>
@@ -429,7 +438,7 @@ const VehicleReservationPage: React.FC = () => {
                                         <Card.Footer className="bg-white border-0">
                                             <Button
                                                 variant="warning"
-                                                onClick={() => { /* Implement join carpool action if needed */ }}
+                                                onClick={() => handleCarpooling(id_trip)}
                                                 className="w-100"
                                             >
                                                 Rejoindre le covoiturage
