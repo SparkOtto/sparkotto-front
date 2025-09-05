@@ -6,36 +6,12 @@ type ReservationStatus = 'pending' | 'confirmed' | 'completed';
 
 type CalendarProps = {
     selectedDate?: Date | [Date, Date];
-    onDateChange?: (date: Date) => void;
+    onDateChange?: (date: Date, id_trip: number) => void;
     reservations?: Trip[];
 };
 
 const getDaysInMonth = (year: number, month: number) => {
     return new Date(year, month + 1, 0).getDate();
-};
-
-const getReservationStatuses = (
-    reservations: Trip[] | undefined,
-    date: Date
-): ReservationStatus[] => {
-    if (!reservations) return [];
-    const dateCopy = new Date(date);
-    dateCopy.setHours(0, 0, 0, 0);
-    return reservations
-        .filter((res) => {
-            const start = new Date(res.start_date);
-            const end = new Date(res.end_date);
-            start.setHours(0, 0, 0, 0);
-            end.setHours(0, 0, 0, 0);
-            return dateCopy >= start && dateCopy <= end;
-        })
-        .map(res => res.reservation_status as ReservationStatus);
-};
-
-const statusClass: Record<ReservationStatus, string> = {
-    pending: 'bg-warning text-dark',
-    confirmed: 'bg-primary text-white',
-    completed: 'bg-success text-white',
 };
 
 const Calendar: React.FC<CalendarProps> = ({
@@ -80,9 +56,19 @@ const Calendar: React.FC<CalendarProps> = ({
         }
     };
 
-    const handleDateClick = (day: number) => {
+    const handleDateClick = (id_trip: number | undefined, day: number) => {
+        if (id_trip !== undefined) {
+            // Find the reservation by id_trip and pass it to onDateChange or another callback
+            const reservation = reservations?.find(res => res.id_trip === id_trip);
+            if (reservation && onDateChange) {
+                // Option 1: Pass the start_date of the reservation
+                onDateChange(new Date(reservation.start_date), id_trip);
+                return;
+            }
+        }
+        // Fallback: pass the clicked date
         const date = new Date(currentYear, currentMonth, day);
-        onDateChange?.(date);
+        onDateChange?.(date, id_trip ?? -1);
     };
 
     const renderDays = () => {
@@ -138,7 +124,7 @@ const Calendar: React.FC<CalendarProps> = ({
                             position: 'relative',
                             paddingBottom: sortedReservations.length > 0 ? sortedReservations.length * 18 + 8 : undefined,
                         }}
-                        onClick={() => handleDateClick(day)}
+                        tabIndex={0} // Prevent focus, since reservations are now clickable
                     >
                         <span>{day}</span>
                         <div
@@ -163,22 +149,31 @@ const Calendar: React.FC<CalendarProps> = ({
                                 end.setHours(0, 0, 0, 0);
                                 const status = res.reservation_status as ReservationStatus;
 
-                                const daySpan = (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24) + 1;
-                                const info = `${res.vehicle.brand} ${res.vehicle.model} - (${TRIP_STATUS_LABELS[status]})`;
+                                // Correction: calculer le nombre de jours restant dans le mois courant
+                                const reservationStart = start.getTime() < new Date(currentYear, currentMonth, 1).getTime()
+                                    ? new Date(currentYear, currentMonth, 1)
+                                    : start;
+                                const reservationEnd = end.getTime() > new Date(currentYear, currentMonth + 1, 0).getTime()
+                                    ? new Date(currentYear, currentMonth + 1, 0)
+                                    : end;
 
+                                // Si la date courante n'est pas dans la plage de la réservation, ne rien afficher
+                                if (date.getTime() < reservationStart.getTime() || date.getTime() > reservationEnd.getTime()) return null;
+
+                                // Calcul du span sur la semaine courante
                                 const weekDay = (date.getDay() + 6) % 7;
                                 const daysLeftInRow = 7 - weekDay;
+                                const daysLeftInMonth = daysInMonth - day + 1;
+                                const daysLeftInReservation = Math.floor((reservationEnd.getTime() - date.getTime()) / (1000 * 60 * 60 * 24)) + 1;
 
-                                if (date.getTime() < start.getTime() || date.getTime() > end.getTime()) return null;
+                                // La barre ne doit pas dépasser la fin du mois
+                                let barDays = Math.min(daysLeftInRow, daysLeftInMonth, daysLeftInReservation);
 
-                                let barDays = Math.min(daySpan - (date.getTime() - start.getTime()) / (1000 * 60 * 60 * 24), daysLeftInRow);
-                                if (date.getTime() > start.getTime()) {
-                                    barDays = Math.min((end.getTime() - date.getTime()) / (1000 * 60 * 60 * 24) + 1, daysLeftInRow);
-                                }
-
-                                if (weekDay === 0 || date.getTime() === start.getTime()) {
+                                // Afficher la barre seulement le premier jour de la réservation dans le mois ou le lundi
+                                if (date.getTime() === reservationStart.getTime() || weekDay === 0) {
+                                    const info = `${res.vehicle.brand} ${res.vehicle.model} - (${res.agency_departure.city} → ${res.agency_arrival.city})`;
                                     return (
-                                        <div
+                                        <button
                                             key={res.id_trip ?? idx}
                                             style={{
                                                 position: 'relative',
@@ -203,14 +198,36 @@ const Calendar: React.FC<CalendarProps> = ({
                                                 overflow: 'hidden',
                                                 whiteSpace: 'nowrap',
                                                 textOverflow: 'ellipsis',
-                                                pointerEvents: 'none',
+                                                pointerEvents: 'auto',
                                                 boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                                                 marginBottom: 2,
+                                                border: 'none',
+                                                cursor: 'pointer',
                                             }}
                                             title={info}
+                                            onClick={e => {
+                                                e.stopPropagation();
+                                                handleDateClick(res.id_trip, day);
+                                            }}
+                                            onMouseEnter={e => {
+                                                e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.15)';
+                                                e.currentTarget.style.background = status === 'pending'
+                                                    ? '#ffe066'
+                                                    : status === 'confirmed'
+                                                        ? '#2563eb'
+                                                        : '#28a745';
+                                            }}
+                                            onMouseLeave={e => {
+                                                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
+                                                e.currentTarget.style.background = status === 'pending'
+                                                    ? '#ffc107'
+                                                    : status === 'confirmed'
+                                                        ? '#0d6efd'
+                                                        : '#198754';
+                                            }}
                                         >
                                             {info}
-                                        </div>
+                                        </button>
                                     );
                                 }
                                 return null;

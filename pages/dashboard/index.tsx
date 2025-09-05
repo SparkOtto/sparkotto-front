@@ -35,10 +35,6 @@ export default function Dashboard() {
             .finally(() => setLoading(false));
     }, []);
 
-    const handleTripSelect = (trip: Trip) => {
-        setSelectedTrip(trip);
-    };
-
     return (
         <Layout>
             <>
@@ -383,14 +379,15 @@ export default function Dashboard() {
                             ? [new Date(selectedTrip.start_date), new Date(selectedTrip.end_date)]
                             : undefined
                     }
-                    onDateChange={(date) => {
+                    onDateChange={(date, id_trip) => {
                         const tripOnDate = trips.find(trip => {
                             const start = new Date(trip.start_date);
                             const end = new Date(trip.end_date);
-                            return (
-                                date >= start &&
-                                date <= end
-                            );
+                            // Si id_trip est fourni, on filtre par id_trip, sinon par date
+                            if (id_trip !== undefined) {
+                                return trip.id_trip === id_trip;
+                            }
+                            return date >= start && date <= end;
                         });
                         if (tripOnDate) {
                             setSelectedTrip(tripOnDate);
