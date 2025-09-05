@@ -11,7 +11,7 @@ import Link from 'next/link';
 import { ToastContainer, toast } from 'react-toastify';
 import { useRouter } from 'next/router';
 import Cookies from 'js-cookie'
-import { Image } from 'react-bootstrap';
+import Logo from '../components/Logo';
 
 
 export default function AuthForm() {
@@ -99,7 +99,7 @@ export default function AuthForm() {
 
   return (
     <div className="d-flex flex-column align-items-center justify-content-center">
-      <Image src="../images/logo.svg" alt="Logo" className='logo img-fluid' />
+      <Logo />
       <ToastContainer
         position="top-right"
         autoClose={3000}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Form, Button, Image } from 'react-bootstrap';
 import Link from 'next/link';
+import Logo from '../components/Logo';
 
 export default function DoubleAuth() {
   const [code, setCode] = useState('');
@@ -15,7 +16,7 @@ export default function DoubleAuth() {
 
   return (
     <div className="d-inline-flex flex-column align-items-center justify-content-center vh-100 bg-purple">
-      <Image src="../images/logo.svg" alt="Logo" className='logo img-fluid' />
+      <Logo />
       <div className="bg-white p-5 rounded shadow m-5 authForm text-left">
         <Form className='w-100'>
           <Link href="/" passHref className='text-dark d-block text-start mb-3'>

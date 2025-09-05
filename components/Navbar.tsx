@@ -6,7 +6,7 @@ import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { Image } from 'react-bootstrap';
+import Logo from '../components/Logo';
 
 export default function Sidebar() {
   const [show, setShow] = useState(false);
@@ -20,7 +20,7 @@ export default function Sidebar() {
     <>
       <div className="text-center mb-4">
         <Link href="/" className="text-decoration-none text-white">
-            <Image src="../images/logo.svg" alt="Logo" className='logo img-fluid' />
+          <Logo />
         </Link>
       </div>
       <Nav className="flex-column">
@@ -59,7 +59,7 @@ export default function Sidebar() {
         <Container fluid>
           <Navbar.Brand>
             <Link href="/" className="text-decoration-none text-white">
-              <Image src="../images/logo.svg" alt="Logo" className='logo img-fluid' />
+              <Logo />
             </Link>
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="offcanvasNavbar" onClick={handleShow} className="bg-yellow" />
