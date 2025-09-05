@@ -6,6 +6,7 @@ import { Trip, Carpooling } from '../../components/Interface';
 import dynamic from "next/dynamic";
 import Cookies from 'js-cookie';
 import { TRIP_STATUS_LABELS } from '../../components/ReservationStatus';
+import Calendar from '../../components/Calendar';
 
 const Map = dynamic(() => import('../../components/MapTrip/Map'), {
     ssr: false
@@ -375,6 +376,27 @@ export default function Dashboard() {
                         </Row>
                     )}
                 </div>
+                <Calendar
+                    reservations={trips}
+                    selectedDate={
+                        selectedTrip
+                            ? [new Date(selectedTrip.start_date), new Date(selectedTrip.end_date)]
+                            : undefined
+                    }
+                    onDateChange={(date) => {
+                        const tripOnDate = trips.find(trip => {
+                            const start = new Date(trip.start_date);
+                            const end = new Date(trip.end_date);
+                            return (
+                                date >= start &&
+                                date <= end
+                            );
+                        });
+                        if (tripOnDate) {
+                            setSelectedTrip(tripOnDate);
+                        }
+                    }}
+                />
             </>
         </Layout>
     );
