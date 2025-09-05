@@ -247,7 +247,7 @@ const VehicleReservationPage: React.FC = () => {
             end_date: reservationInfo.endDate ? reservationInfo.endDate.toISOString() : null,
             departure_agency: Number(info.departureAgency),
             arrival_agency: Number(info.arrivalAgency),
-            reservation_status: "pending",
+            reservation_status: "confirmed",
             carpooling: true,
         };
 
