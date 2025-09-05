@@ -4,11 +4,9 @@ import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
-import Logo from './Logo';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-
-const LogoMemo = React.memo(Logo);
+import { Image } from 'react-bootstrap';
 
 export default function Sidebar() {
   const [show, setShow] = useState(false);
@@ -22,7 +20,7 @@ export default function Sidebar() {
     <>
       <div className="text-center mb-4">
         <Link href="/" className="text-decoration-none text-white">
-            <LogoMemo />
+            <Image src="../images/logo.svg" alt="Logo" className='logo img-fluid' />
         </Link>
       </div>
       <Nav className="flex-column">
@@ -61,7 +59,7 @@ export default function Sidebar() {
         <Container fluid>
           <Navbar.Brand>
             <Link href="/" className="text-decoration-none text-white">
-              <Logo />
+              <Image src="../images/logo.svg" alt="Logo" className='logo img-fluid' />
             </Link>
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="offcanvasNavbar" onClick={handleShow} className="bg-yellow" />

@@ -1,12 +1,11 @@
 import React from 'react';
-import { Form, Button, Tab, Tabs, Row, Col } from 'react-bootstrap';
-import Logo from './Logo';
+import { Form, Button, Tab, Tabs, Row, Col, Image } from 'react-bootstrap';
 import Link from 'next/link';
 
 export default function ForgotPassword() {
   return (
     <div className="d-inline-flex flex-column align-items-center justify-content-center">
-      <Logo />
+      <Image src="../images/logo.svg" alt="Logo" className='logo img-fluid' />
       <div className="bg-white p-5 rounded shadow m-5 authForm">
         <Form className='w-100'>
             <Link href="/" passHref className='text-dark'>
