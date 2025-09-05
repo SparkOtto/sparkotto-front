@@ -224,6 +224,21 @@ const VehicleReservationPage: React.FC = () => {
 
         const userCookie = Cookies.get('user');
 
+        // Vérifier que le véhicule n'est pas déjà réserver aux mêmes dates
+        selectedVehicle.trips?.forEach(trip => {
+            if (trip.reservation_status === "pending" || trip.reservation_status === "confirmed") {
+                const tripStart = new Date(trip.start_date);
+                const tripEnd = new Date(trip.end_date);
+                if (
+                    (reservationInfo.startDate && tripStart <= reservationInfo.startDate && tripEnd >= reservationInfo.startDate) ||
+                    (reservationInfo.endDate && tripStart <= reservationInfo.endDate && tripEnd >= reservationInfo.endDate)
+                ) {
+                    toast.error("Ce véhicule est déjà réservé aux mêmes dates.");
+                    return;
+                }
+            }
+        });
+
         const payload = {
             id_used_key: selectedVehicle.keys[0].id_key,
             id_vehicle: selectedVehicle.id_vehicle,

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Trip } from '../components/Interface';
 import { TRIP_STATUS_LABELS } from './ReservationStatus';
 
-type ReservationStatus = 'pending' | 'confirmed' | 'completed';
+type ReservationStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled';
 
 type CalendarProps = {
     selectedDate?: Date | [Date, Date];
@@ -73,19 +73,21 @@ const Calendar: React.FC<CalendarProps> = ({
 
     const renderDays = () => {
         const days = [];
-        // Responsive cell width
-        const getCellWidth = () => {
-            if (typeof window !== 'undefined') {
-                if (window.innerWidth < 576) return 44;
-                if (window.innerWidth < 768) return 60;
-                if (window.innerWidth < 992) return 80;
-            }
-            return 110;
-        };
-        const cellWidth = getCellWidth();
+        // Responsive cell width using CSS clamp for better adaptability
+        const cellWidth = 'clamp(40px, 12vw, 110px)';
 
         for (let i = 0; i < firstDayOfMonth; i++) {
-            days.push(<td key={`empty-${i}`} style={{ height: 80, background: '#f8f9fa', minWidth: cellWidth }}></td>);
+            days.push(
+                <td
+                    key={`empty-${i}`}
+                    style={{
+                        height: 'clamp(40px, 10vw, 80px)',
+                        background: '#f8f9fa',
+                        minWidth: cellWidth,
+                        width: cellWidth,
+                    }}
+                ></td>
+            );
         }
         for (let day = 1; day <= daysInMonth; day++) {
             const date = new Date(currentYear, currentMonth, day);
@@ -109,7 +111,16 @@ const Calendar: React.FC<CalendarProps> = ({
             if (isSelected) className += ' border-3 border-dark';
 
             days.push(
-                <td key={day} style={{ padding: 0, height: 80, minWidth: cellWidth, position: 'relative' }}>
+                <td
+                    key={day}
+                    style={{
+                        padding: 0,
+                        height: 'clamp(40px, 10vw, 80px)',
+                        minWidth: cellWidth,
+                        width: cellWidth,
+                        position: 'relative',
+                    }}
+                >
                     <button
                         className={className}
                         style={{
@@ -117,14 +128,14 @@ const Calendar: React.FC<CalendarProps> = ({
                             height: '100%',
                             borderRadius: 0,
                             fontWeight: isSelected ? 'bold' : 'normal',
-                            fontSize: cellWidth < 60 ? 14 : cellWidth < 80 ? 16 : 22,
+                            fontSize: 'clamp(12px, 2vw, 22px)',
                             boxShadow: isSelected ? '0 0 0 2px #333' : undefined,
                             transition: 'box-shadow 0.2s',
                             background: isSelected ? '#e9ecef' : undefined,
                             position: 'relative',
                             paddingBottom: sortedReservations.length > 0 ? sortedReservations.length * 18 + 8 : undefined,
                         }}
-                        tabIndex={0} // Prevent focus, since reservations are now clickable
+                        tabIndex={0}
                     >
                         <span>{day}</span>
                         <div
@@ -149,7 +160,6 @@ const Calendar: React.FC<CalendarProps> = ({
                                 end.setHours(0, 0, 0, 0);
                                 const status = res.reservation_status as ReservationStatus;
 
-                                // Correction: calculer le nombre de jours restant dans le mois courant
                                 const reservationStart = start.getTime() < new Date(currentYear, currentMonth, 1).getTime()
                                     ? new Date(currentYear, currentMonth, 1)
                                     : start;
@@ -157,19 +167,15 @@ const Calendar: React.FC<CalendarProps> = ({
                                     ? new Date(currentYear, currentMonth + 1, 0)
                                     : end;
 
-                                // Si la date courante n'est pas dans la plage de la réservation, ne rien afficher
                                 if (date.getTime() < reservationStart.getTime() || date.getTime() > reservationEnd.getTime()) return null;
 
-                                // Calcul du span sur la semaine courante
                                 const weekDay = (date.getDay() + 6) % 7;
                                 const daysLeftInRow = 7 - weekDay;
                                 const daysLeftInMonth = daysInMonth - day + 1;
                                 const daysLeftInReservation = Math.floor((reservationEnd.getTime() - date.getTime()) / (1000 * 60 * 60 * 24)) + 1;
 
-                                // La barre ne doit pas dépasser la fin du mois
                                 let barDays = Math.min(daysLeftInRow, daysLeftInMonth, daysLeftInReservation);
 
-                                // Afficher la barre seulement le premier jour de la réservation dans le mois ou le lundi
                                 if (date.getTime() === reservationStart.getTime() || weekDay === 0) {
                                     const info = `${res.vehicle.brand} ${res.vehicle.model} - (${res.agency_departure.city} → ${res.agency_arrival.city})`;
                                     return (
@@ -177,8 +183,8 @@ const Calendar: React.FC<CalendarProps> = ({
                                             key={res.id_trip ?? idx}
                                             style={{
                                                 position: 'relative',
-                                                width: barDays * cellWidth,
-                                                height: 16,
+                                                width: `calc(${barDays} * ${cellWidth})`,
+                                                height: 'clamp(12px, 2vw, 16px)',
                                                 background: status === 'pending'
                                                     ? '#ffc107'
                                                     : status === 'confirmed'
@@ -193,7 +199,7 @@ const Calendar: React.FC<CalendarProps> = ({
                                                 color: status === 'pending'
                                                     ? '#212529'
                                                     : '#fff',
-                                                fontSize: cellWidth < 60 ? 10 : 12,
+                                                fontSize: 'clamp(10px, 1.5vw, 12px)',
                                                 fontWeight: 500,
                                                 overflow: 'hidden',
                                                 whiteSpace: 'nowrap',
@@ -251,45 +257,77 @@ const Calendar: React.FC<CalendarProps> = ({
     ];
 
     return (
-        <div className="container my-4" style={{ maxWidth: 800 }}>
-            <div className="d-flex justify-content-between align-items-center mb-3">
-                <button className="btn btn-outline-secondary btn-lg" onClick={handlePrevMonth}>&lt;</button>
-                <span className="fw-bold fs-2">
-                    {monthNames[currentMonth]} {currentYear}
-                </span>
-                <button className="btn btn-outline-secondary btn-lg" onClick={handleNextMonth}>&gt;</button>
+        <div className="container my-4" style={{ maxWidth: 800, width: '100%' }}>
+            <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+            <button className="btn btn-outline-secondary btn-lg" onClick={handlePrevMonth}>&lt;</button>
+            <span className="fw-bold fs-2 text-center" style={{ flex: 1, minWidth: 180 }}>
+                {monthNames[currentMonth]} {currentYear}
+            </span>
+            <button className="btn btn-outline-secondary btn-lg" onClick={handleNextMonth}>&gt;</button>
             </div>
-            <table className="table table-bordered text-center" style={{ tableLayout: 'fixed', fontSize: 18 }}>
+            <div style={{ overflowX: 'auto', width: '100%' }}>
+            <table
+                className="table table-bordered text-center"
+                style={{
+                tableLayout: 'fixed',
+                fontSize: 'clamp(12px, 2vw, 18px)',
+                minWidth: 560,
+                width: '100%',
+                maxWidth: '100%',
+                }}
+            >
                 <thead>
-                    <tr>
-                        <th style={{ width: 80 }}>Lun</th>
-                        <th style={{ width: 80 }}>Mar</th>
-                        <th style={{ width: 80 }}>Mer</th>
-                        <th style={{ width: 80 }}>Jeu</th>
-                        <th style={{ width: 80 }}>Ven</th>
-                        <th style={{ width: 80 }}>Sam</th>
-                        <th style={{ width: 80 }}>Dim</th>
-                    </tr>
+                <tr>
+                    <th style={{ width: 'clamp(40px, 12vw, 110px)' }}>Lun</th>
+                    <th style={{ width: 'clamp(40px, 12vw, 110px)' }}>Mar</th>
+                    <th style={{ width: 'clamp(40px, 12vw, 110px)' }}>Mer</th>
+                    <th style={{ width: 'clamp(40px, 12vw, 110px)' }}>Jeu</th>
+                    <th style={{ width: 'clamp(40px, 12vw, 110px)' }}>Ven</th>
+                    <th style={{ width: 'clamp(40px, 12vw, 110px)' }}>Sam</th>
+                    <th style={{ width: 'clamp(40px, 12vw, 110px)' }}>Dim</th>
+                </tr>
                 </thead>
                 <tbody>{renderDays()}</tbody>
             </table>
-            <div className="mt-3 d-flex gap-3">
-                <span className="badge bg-warning text-dark px-3 py-2 fs-6">{TRIP_STATUS_LABELS['pending']}</span>
-                <span className="badge bg-primary px-3 py-2 fs-6">{TRIP_STATUS_LABELS['confirmed']}</span>
-                <span className="badge bg-success px-3 py-2 fs-6">{TRIP_STATUS_LABELS['completed']}</span>
+            </div>
+            <div className="mt-3 d-flex flex-wrap gap-3">
+            <span className="badge bg-warning text-dark px-3 py-2 fs-6">{TRIP_STATUS_LABELS['pending']}</span>
+            <span className="badge bg-primary px-3 py-2 fs-6">{TRIP_STATUS_LABELS['confirmed']}</span>
+            <span className="badge bg-success px-3 py-2 fs-6">{TRIP_STATUS_LABELS['completed']}</span>
             </div>
             <style jsx>{`
+            .calendar-day-box {
+                background: #fff;
+                cursor: pointer;
+                border-radius: 0;
+                min-height: clamp(40px, 10vw, 80px);
+                min-width: clamp(40px, 12vw, 110px);
+                transition: background 0.2s;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: flex-start;
+            }
+            .calendar-day-box:hover {
+                background: #f1f3f4;
+            }
+            @media (max-width: 600px) {
                 .calendar-day-box {
-                    background: #fff;
-                    cursor: pointer;
-                    border-radius: 0;
-                    min-height: 80px;
-                    min-width: 80px;
-                    transition: background 0.2s;
+                min-width: 40px;
+                min-height: 40px;
+                font-size: 14px;
                 }
-                .calendar-day-box:hover {
-                    background: #f1f3f4;
+                .fs-2 {
+                font-size: 1.2rem !important;
                 }
+            }
+            @media (max-width: 400px) {
+                .calendar-day-box {
+                min-width: 32px;
+                min-height: 32px;
+                font-size: 12px;
+                }
+            }
             `}</style>
         </div>
     );

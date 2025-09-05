@@ -1,7 +1,8 @@
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import React from 'react';
-import { Navbar, Form, FormControl, Button, Container, Row, Col, Dropdown } from 'react-bootstrap';
-import { FaBell, FaQuestionCircle, FaSearch } from 'react-icons/fa';
+import { Navbar, Container, Row, Col, Dropdown } from 'react-bootstrap';
+import { FaCalendarDays } from 'react-icons/fa6';
 
 export default function CustomNavbar() {
 
@@ -50,7 +51,12 @@ export default function CustomNavbar() {
     <Navbar className='p-4'>
       <Container fluid>
             <Row className="w-100">
-              <Col className="d-flex justify-content-end align-items-center">
+              <Col className="d-flex justify-content-end align-items-center gap-3">
+
+                <Link id="calendar-link" href="/dashboard" className="text-decoration-none text-dark d-flex align-items-center">
+                  <FaCalendarDays size={23} />
+                </Link>
+                
                 <Dropdown>
                   <Dropdown.Toggle as="div" className="d-flex align-items-center justify-content-center bg-black px-3 py-1 rounded-pill cursor-pointer text-white border-0">
                     <span className="d-lg-inline d-none">
