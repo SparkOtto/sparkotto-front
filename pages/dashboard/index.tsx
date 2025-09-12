@@ -60,6 +60,16 @@ export default function Dashboard() {
 
     }, []);
 
+    const handleSelectedTrip = (trip: Trip) => {
+        setSelectedTrip(trip);
+        setVehicleBackState({
+            mileage: trip.vehicle.mileage || 0,
+            internal_cleanliness: trip.vehicle.state_records[trip.vehicle.state_records.length - 1]?.internal_cleanliness || 0,
+            external_cleanliness: trip.vehicle.state_records[trip.vehicle.state_records.length - 1]?.external_cleanliness || 0,
+            comment: trip.vehicle.state_records[trip.vehicle.state_records.length - 1]?.comment || '',
+        });
+    }
+
     const handleVehicleStateSubmit = async (selectedTrip : Trip) => {
         const updateKMVehicle = await fetch(`${process.env.backendAPI}/api/vehicles/${selectedTrip.vehicle.id_vehicle}`, {
             method: 'PUT',
@@ -150,6 +160,7 @@ export default function Dashboard() {
                             tabIndex={-1}
                             role="dialog"
                         >
+
                             <div className="modal-dialog modal-xl" role="document">
                                 <div className="modal-content">
                                     <div className="modal-header">
@@ -212,84 +223,89 @@ export default function Dashboard() {
                                         </div>
                                     </div>
                                     <div className="modal-footer flex-column align-items-stretch gap-3 py-4">
-                                        {selectedTrip?.reservation_status === 'confirmed' && (
-                                            <div className="w-100 mb-3 p-3 bg-light rounded border">
-                                                <h6 className="fw-bold mb-3">État des lieux de retour</h6>
-                                                <Form>
-                                                    <Form.Group className="mb-3" controlId="formMileage">
-                                                        <Form.Label>Kilométrage du véhicule</Form.Label>
-                                                        <Form.Control
-                                                            type="number"
-                                                            min={0}
-                                                            placeholder="Entrez le kilométrage actuel"
-                                                            defaultValue={selectedTrip.vehicle.mileage || ''}
-                                                            onChange={e => setVehicleBackState({ ...vehicleBackState, mileage: Number(e.target.value) })}
-                                                        />
-                                                    </Form.Group>
-                                                    <div className="d-flex justify-content-center align-items-center gap-5 mb-3">
-                                                        {/* État intérieur */}
-                                                        <div className="text-center">
-                                                            <div className="mb-2 fw-semibold">Intérieur</div>
-                                                            {[1, 2, 3, 4, 5].map((star) => (
-                                                                <span
-                                                                    key={`interieur-${star}`}
-                                                                    style={{
-                                                                        cursor: "pointer",
-                                                                        color: vehicleBackState.internal_cleanliness >= star ? "#ffc107" : "#e4e5e9",
-                                                                        fontSize: 24,
-                                                                    }}
-                                                                    data-testid={`star-interieur-${star}`}
-                                                                    onClick={() => setVehicleBackState({ ...vehicleBackState, internal_cleanliness: star })}
-                                                                > 
-                                                                    ★
-                                                                </span>
-                                                            ))}
+                                        {selectedTrip?.reservation_status === 'confirmed' &&
+                                            new Date() > new Date(selectedTrip.end_date) && (
+                                            <details className="w-100 mb-3 p-3 bg-light rounded border">
+                                                <summary style={{ cursor: "pointer", fontWeight: 600, fontSize: 16 }}>
+                                                    État des lieux de retour
+                                                </summary>
+                                                <div className="mt-3">
+                                                    <Form>
+                                                        <Form.Group className="mb-3" controlId="formMileage">
+                                                            <Form.Label>Kilométrage du véhicule</Form.Label>
+                                                            <Form.Control
+                                                                type="number"
+                                                                min={0}
+                                                                placeholder="Entrez le kilométrage actuel"
+                                                                defaultValue={selectedTrip.vehicle.mileage || ''}
+                                                                onChange={e => setVehicleBackState({ ...vehicleBackState, mileage: Number(e.target.value) })}
+                                                            />
+                                                        </Form.Group>
+                                                        <div className="d-flex justify-content-center align-items-center gap-5 mb-3">
+                                                            {/* État intérieur */}
+                                                            <div className="text-center">
+                                                                <div className="mb-2 fw-semibold">Intérieur</div>
+                                                                {[1, 2, 3, 4, 5].map((star) => (
+                                                                    <span
+                                                                        key={`interieur-${star}`}
+                                                                        style={{
+                                                                            cursor: "pointer",
+                                                                            color: vehicleBackState.internal_cleanliness >= star ? "#ffc107" : "#e4e5e9",
+                                                                            fontSize: 24,
+                                                                        }}
+                                                                        data-testid={`star-interieur-${star}`}
+                                                                        onClick={() => setVehicleBackState({ ...vehicleBackState, internal_cleanliness: star })}
+                                                                    >
+                                                                        ★
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                            {/* État extérieur */}
+                                                            <div className="text-center">
+                                                                <div className="mb-2 fw-semibold">Extérieur</div>
+                                                                {[1, 2, 3, 4, 5].map((star) => (
+                                                                    <span
+                                                                        key={`exterieur-${star}`}
+                                                                        style={{
+                                                                            cursor: "pointer",
+                                                                            color: vehicleBackState.external_cleanliness >= star ? "#ffc107" : "#e4e5e9",
+                                                                            fontSize: 24,
+                                                                        }}
+                                                                        data-testid={`star-exterieur-${star}`}
+                                                                        onClick={() => setVehicleBackState({ ...vehicleBackState, external_cleanliness: star })}
+                                                                    >
+                                                                        ★
+                                                                    </span>
+                                                                ))}
+                                                            </div>
                                                         </div>
-                                                        {/* État extérieur */}
-                                                        <div className="text-center">
-                                                            <div className="mb-2 fw-semibold">Extérieur</div>
-                                                            {[1, 2, 3, 4, 5].map((star) => (
-                                                                <span
-                                                                    key={`exterieur-${star}`}
-                                                                    style={{
-                                                                        cursor: "pointer",
-                                                                        color: vehicleBackState.external_cleanliness >= star ? "#ffc107" : "#e4e5e9",
-                                                                        fontSize: 24,
-                                                                    }}
-                                                                    data-testid={`star-exterieur-${star}`}
-                                                                    onClick={() => setVehicleBackState({ ...vehicleBackState, external_cleanliness: star })}
-                                                                >
-                                                                    ★
-                                                                </span>
-                                                            ))}
+                                                        <Form.Group controlId="reservationComment" className="my-4">
+                                                            <Form.Label>Commentaire (optionnel)</Form.Label>
+                                                            <Form.Control
+                                                                as="textarea"
+                                                                rows={3}
+                                                                name="comment"
+                                                                value={vehicleBackState.comment || ''}
+                                                                placeholder="Ajouter un commentaire pour la réservation"
+                                                                onChange={e => setVehicleBackState({ ...vehicleBackState, comment: e.target.value })}
+                                                            />
+                                                        </Form.Group>
+                                                        <div className="d-flex justify-content-end">
+                                                            <Button
+                                                                variant="primary"
+                                                                type="submit"
+                                                                className='text-white'
+                                                                onClick={e => {
+                                                                    e.preventDefault();
+                                                                    handleVehicleStateSubmit(selectedTrip, vehicleBackState);
+                                                                }}
+                                                            >
+                                                                Enregistrer l'état des lieux
+                                                            </Button>
                                                         </div>
-                                                    </div>
-                                                    <Form.Group controlId="reservationComment" className="my-4">
-                                                        <Form.Label>Commentaire (optionnel)</Form.Label>
-                                                        <Form.Control
-                                                            as="textarea"
-                                                            rows={3}
-                                                            name="comment"
-                                                            value={vehicleBackState.comment || ''}
-                                                            placeholder="Ajouter un commentaire pour la réservation"
-                                                            onChange={e => setVehicleBackState({ ...vehicleBackState, comment: e.target.value })}
-                                                        />
-                                                    </Form.Group>
-                                                    <div className="d-flex justify-content-end">
-                                                        <Button
-                                                            variant="primary"
-                                                            type="submit"
-                                                            className='text-white'
-                                                            onClick={e => {
-                                                                e.preventDefault();
-                                                                handleVehicleStateSubmit(selectedTrip, vehicleBackState);
-                                                            }}
-                                                        >
-                                                            Enregistrer l'état des lieux
-                                                        </Button>
-                                                    </div>
-                                                </Form>
-                                            </div>
+                                                    </Form>
+                                                </div>
+                                            </details>
                                         )}
                                         <div className="d-flex justify-content-end w-100">
                                             <Button variant="secondary" onClick={() => setSelectedTrip(null)}>
@@ -466,7 +482,7 @@ export default function Dashboard() {
                                                                 Trajet en cours
                                                             </span>
                                                         </div>
-                                                        <Button variant="outline-warning" className="w-100" onClick={() => setSelectedTrip(trip)}>
+                                                        <Button variant="outline-warning" className="w-100" onClick={() => handleSelectedTrip(trip)}>
                                                             Voir le trajet
                                                         </Button>
                                                     </Card.Body>
