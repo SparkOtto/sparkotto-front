@@ -1,13 +1,14 @@
 
 import React, { useEffect, useState } from 'react';
 import Layout from '../../components/Layout';
-import { Card, Button, Form, Row, Col, Modal } from 'react-bootstrap';
-import { Trip, Carpooling } from '../../components/Interface';
+import { Card, Button, Form, Row, Col } from 'react-bootstrap';
+import { Trip } from '../../components/Interface';
 import dynamic from "next/dynamic";
 import Cookies from 'js-cookie';
 import { TRIP_STATUS_LABELS } from '../../components/ReservationStatus';
 import Calendar from '../../components/Calendar';
 import { FaArrowCircleRight } from 'react-icons/fa';
+import { toast } from 'react-toastify';
 
 const Map = dynamic(() => import('../../components/MapTrip/Map'), {
     ssr: false
@@ -20,6 +21,12 @@ export default function Dashboard() {
     const userId = userCookie ? Number(JSON.parse(userCookie).id) : null;
     const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
     const [showCalendar, setShowCalendar] = useState(true);
+    const [vehicleBackState, setVehicleBackState] = useState({
+        mileage: 0,
+        internal_cleanliness: 0,
+        external_cleanliness: 0,
+        comment: '',
+    })
 
     useEffect(() => {
         fetch(`${process.env.backendAPI}/api/trip/my/${userId}`,
@@ -52,6 +59,85 @@ export default function Dashboard() {
         }
 
     }, []);
+
+    const handleVehicleStateSubmit = async (selectedTrip : Trip) => {
+        const updateKMVehicle = await fetch(`${process.env.backendAPI}/api/vehicles/${selectedTrip.vehicle.id_vehicle}`, {
+            method: 'PUT',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                mileage: vehicleBackState.mileage,
+            }),
+        });
+
+        if (updateKMVehicle.ok) {
+            const updateKMVehicleData = await updateKMVehicle.json();
+
+            // Mettre à jour le statut de la réservation
+            const vehicleState = await fetch(`${process.env.backendAPI}/api/vehicleState`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    id_vehicle: selectedTrip.vehicle.id_vehicle,
+                    state_type: 'arrival',
+                    internal_cleanliness: vehicleBackState.internal_cleanliness,
+                    external_cleanliness: vehicleBackState.external_cleanliness,
+                    comment: vehicleBackState.comment,
+                }),
+            });
+
+            if (vehicleState.ok) {
+                const updateTrip = await fetch(`${process.env.backendAPI}/api/trip/${selectedTrip.id_trip}`, {
+                    method: 'PUT',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        reservation_status: 'completed',
+                    }),
+                });
+
+                if (updateTrip.ok) {
+                    toast.success("État des lieux enregistré et trajet terminé !");
+                    setSelectedTrip(null);
+                    setVehicleBackState({
+                        mileage: 0,
+                        internal_cleanliness: 0,
+                        external_cleanliness: 0,
+                        comment: '',
+                    });
+                    // Mettre à jour la liste des trajets
+                    setLoading(true);
+                    fetch(`${process.env.backendAPI}/api/trip/my/${userId}`, {
+                        method: 'GET',
+                        credentials: 'include',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    })
+                        .then(res => res.json())
+                        .then(data => setTrips(data))
+                        .catch(() => setTrips([]))
+                        .finally(() => setLoading(false));
+                } else {
+                    const errorData = await updateTrip.json();
+                    console.error(errorData.message);
+                    toast.error("Erreur lors de la mise à jour du trajet.");
+                }
+            }
+
+        } else {
+            const errorData = await updateKMVehicle.json();
+            console.error(errorData.message);
+        }
+
+    };
 
     return (
         <Layout>
@@ -125,10 +211,91 @@ export default function Dashboard() {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="modal-footer">
-                                        <Button variant="secondary" onClick={() => setSelectedTrip(null)}>
-                                            Fermer
-                                        </Button>
+                                    <div className="modal-footer flex-column align-items-stretch gap-3 py-4">
+                                        {selectedTrip?.reservation_status === 'confirmed' && (
+                                            <div className="w-100 mb-3 p-3 bg-light rounded border">
+                                                <h6 className="fw-bold mb-3">État des lieux de retour</h6>
+                                                <Form>
+                                                    <Form.Group className="mb-3" controlId="formMileage">
+                                                        <Form.Label>Kilométrage du véhicule</Form.Label>
+                                                        <Form.Control
+                                                            type="number"
+                                                            min={0}
+                                                            placeholder="Entrez le kilométrage actuel"
+                                                            defaultValue={selectedTrip.vehicle.mileage || ''}
+                                                            onChange={e => setVehicleBackState({ ...vehicleBackState, mileage: Number(e.target.value) })}
+                                                        />
+                                                    </Form.Group>
+                                                    <div className="d-flex justify-content-center align-items-center gap-5 mb-3">
+                                                        {/* État intérieur */}
+                                                        <div className="text-center">
+                                                            <div className="mb-2 fw-semibold">Intérieur</div>
+                                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                                <span
+                                                                    key={`interieur-${star}`}
+                                                                    style={{
+                                                                        cursor: "pointer",
+                                                                        color: vehicleBackState.internal_cleanliness >= star ? "#ffc107" : "#e4e5e9",
+                                                                        fontSize: 24,
+                                                                    }}
+                                                                    data-testid={`star-interieur-${star}`}
+                                                                    onClick={() => setVehicleBackState({ ...vehicleBackState, internal_cleanliness: star })}
+                                                                > 
+                                                                    ★
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                        {/* État extérieur */}
+                                                        <div className="text-center">
+                                                            <div className="mb-2 fw-semibold">Extérieur</div>
+                                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                                <span
+                                                                    key={`exterieur-${star}`}
+                                                                    style={{
+                                                                        cursor: "pointer",
+                                                                        color: vehicleBackState.external_cleanliness >= star ? "#ffc107" : "#e4e5e9",
+                                                                        fontSize: 24,
+                                                                    }}
+                                                                    data-testid={`star-exterieur-${star}`}
+                                                                    onClick={() => setVehicleBackState({ ...vehicleBackState, external_cleanliness: star })}
+                                                                >
+                                                                    ★
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                    <Form.Group controlId="reservationComment" className="my-4">
+                                                        <Form.Label>Commentaire (optionnel)</Form.Label>
+                                                        <Form.Control
+                                                            as="textarea"
+                                                            rows={3}
+                                                            name="comment"
+                                                            value={vehicleBackState.comment || ''}
+                                                            placeholder="Ajouter un commentaire pour la réservation"
+                                                            onChange={e => setVehicleBackState({ ...vehicleBackState, comment: e.target.value })}
+                                                        />
+                                                    </Form.Group>
+                                                    <div className="d-flex justify-content-end">
+                                                        <Button
+                                                            variant="primary"
+                                                            type="submit"
+                                                            className='text-white'
+                                                            onClick={e => {
+                                                                e.preventDefault();
+                                                                handleVehicleStateSubmit(selectedTrip, vehicleBackState);
+                                                            }}
+                                                        >
+                                                            Enregistrer l'état des lieux
+                                                        </Button>
+                                                    </div>
+                                                </Form>
+                                            </div>
+                                        )}
+                                        <div className="d-flex justify-content-end w-100">
+                                            <Button variant="secondary" onClick={() => setSelectedTrip(null)}>
+                                                Fermer
+                                            </Button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -239,8 +406,7 @@ export default function Dashboard() {
                             <Row className="g-4">
                                 {trips.filter(trip =>
                                     trip.reservation_status === 'confirmed' &&
-                                    new Date() > new Date(trip.start_date) &&
-                                    new Date() < new Date(trip.end_date)
+                                    new Date() > new Date(trip.start_date)
 
                                 ).length === 0 ? (
                                     <div>Aucun trajet en cours.</div>
@@ -248,8 +414,7 @@ export default function Dashboard() {
                                     trips
                                         .filter(trip =>
                                             trip.reservation_status === 'confirmed' &&
-                                            new Date() > new Date(trip.start_date) &&
-                                            new Date() < new Date(trip.end_date)
+                                            new Date() > new Date(trip.start_date)
                                         )
                                         .map((trip) => (
                                             <Col key={trip.id_trip} xs={12} md={4} lg={4}>
@@ -320,15 +485,13 @@ export default function Dashboard() {
                         ) : (
                             <Row className="g-4">
                                 {trips.filter(trip =>
-                                    trip.reservation_status === 'completed' &&
-                                    new Date(trip.end_date) > new Date()
+                                    trip.reservation_status === 'completed'
                                 ).length === 0 ? (
                                     <div>Aucun trajet passé.</div>
                                 ) : (
                                     trips
                                         .filter(trip =>
-                                            trip.reservation_status === 'completed' &&
-                                            new Date(trip.end_date) > new Date()
+                                            trip.reservation_status === 'completed'
                                         )
                                         .map((trip) => (
                                             <Col key={trip.id_trip} xs={12} md={4} lg={4}>

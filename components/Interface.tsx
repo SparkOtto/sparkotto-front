@@ -17,7 +17,19 @@ export type Vehicle = {
     image?: string;
     trips: Trip[];
     keys: Key[];
+    state_records: StateRecord[];
 };
+
+export type StateRecord = {
+    id_state_record: number;
+    id_vehicle: number;
+    vehicle: Vehicle;
+    state_date: Date;
+    state_type: string;
+    internal_cleanliness: number;
+    external_cleanliness: number;
+    comment: string | null;
+}
 
 export type User = {
     id_user: number;

@@ -279,7 +279,7 @@ const VehicleReservationPage: React.FC = () => {
                     },
                     body: JSON.stringify({
                         id_vehicle: selectedVehicle.id_vehicle,
-                        state_type: 'pending',
+                        state_type: 'departure',
                         internal_cleanliness: reservationInfo.etatInterieur,
                         external_cleanliness: reservationInfo.etatExterieur,
                         comment: reservationInfo.comment,
