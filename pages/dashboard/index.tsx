@@ -63,10 +63,16 @@ export default function Dashboard() {
     const handleSelectedTrip = (trip: Trip) => {
         setSelectedTrip(trip);
         setVehicleBackState({
-            mileage: trip.vehicle.mileage || 0,
-            internal_cleanliness: trip.vehicle.state_records[trip.vehicle.state_records.length - 1]?.internal_cleanliness || 0,
-            external_cleanliness: trip.vehicle.state_records[trip.vehicle.state_records.length - 1]?.external_cleanliness || 0,
-            comment: trip.vehicle.state_records[trip.vehicle.state_records.length - 1]?.comment || '',
+        mileage: trip.vehicle.mileage || 0,
+        internal_cleanliness: Array.isArray(trip.vehicle.state_records) && trip.vehicle.state_records.length > 0
+            ? trip.vehicle.state_records[trip.vehicle.state_records.length - 1].internal_cleanliness
+            : 0,
+        external_cleanliness: Array.isArray(trip.vehicle.state_records) && trip.vehicle.state_records.length > 0
+            ? trip.vehicle.state_records[trip.vehicle.state_records.length - 1].external_cleanliness
+            : 0,
+        comment: Array.isArray(trip.vehicle.state_records) && trip.vehicle.state_records.length > 0
+            ? trip.vehicle.state_records[trip.vehicle.state_records.length - 1].comment
+            : '',
         });
     }
 

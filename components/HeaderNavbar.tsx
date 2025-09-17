@@ -9,6 +9,7 @@ export default function CustomNavbar() {
   const [user, setUser] = React.useState({ first_name: 'John', last_name: 'Doe' });
   const [userRole, setUserRole] = React.useState(null);
   const [showConfirm, setShowConfirm] = React.useState(false);
+  const router = useRouter();
 
   React.useEffect(() => {
     const Cookies = require('js-cookie');
@@ -62,29 +63,29 @@ export default function CustomNavbar() {
                   >
                   <FaCalendarDays size={23} />
                   </button>
-                  {showConfirm && (
-                  <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style={{ background: 'rgba(0,0,0,0.5)', zIndex: 9999 }}>
-                    <div className="bg-white rounded shadow p-4" style={{ minWidth: '300px' }}>
-                    <p className="mb-4">Voulez-vous vraiment être redirigé vers le dashboard&nbsp;?</p>
-                    <div className="d-flex justify-content-end gap-2">
-                      <button
-                      className="btn btn-secondary"
-                      onClick={() => setShowConfirm(false)}
-                      >
-                      Annuler
-                      </button>
-                      <button
-                      className="btn btn-primary"
-                      onClick={() => {
-                        setShowConfirm(false);
-                        window.location.href = "/dashboard";
-                      }}
-                      >
-                      Continuer
-                      </button>
+                  {router.pathname !== "/dashboard" && showConfirm && (
+                    <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style={{ background: 'rgba(0,0,0,0.5)', zIndex: 9999 }}>
+                      <div className="bg-white rounded shadow p-4" style={{ minWidth: '300px' }}>
+                        <p className="mb-4">Voulez-vous vraiment être redirigé vers le dashboard&nbsp;?</p>
+                        <div className="d-flex justify-content-end gap-2">
+                          <button
+                            className="btn btn-secondary"
+                            onClick={() => setShowConfirm(false)}
+                          >
+                            Annuler
+                          </button>
+                          <button
+                            className="btn btn-primary"
+                            onClick={() => {
+                              setShowConfirm(false);
+                              window.location.href = "/dashboard";
+                            }}
+                          >
+                            Continuer
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                    </div>
-                  </div>
                   )}
                 </div>
                 <Dropdown>
