@@ -1,16 +1,32 @@
 import React, { useRef, useState, useEffect } from 'react';
 import Layout from '../../../components/Layout';
-import { Card, Button, Form, Row, Col, FormControl, Dropdown, Container, Modal } from 'react-bootstrap';
-import { FaArrowCircleUp, FaRecycle, FaSearch } from 'react-icons/fa';
-import { FaArrowsRotate, FaFilter, FaPlus, FaAlignJustify, FaTrash } from "react-icons/fa6";
-import { useRouter } from 'next/router';
+import {
+    Card,
+    Button,
+    Row,
+    Col,
+    Form,
+    Container,
+    Modal,
+    Spinner,
+    Badge,
+    Table,
+    Stack,
+    FormControl,
+} from 'react-bootstrap';
+import {
+    FaPlus,
+    FaTrash,
+    FaCar,
+    FaLeaf,
+    FaCheckCircle,
+    FaTimesCircle,
+} from 'react-icons/fa';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-export default function Page() {
-    const router = useRouter();
-
-    // Refs for modal form fields
+export default function VehicleManagement() {
+    // Refs for modal inputs
     const brandRef = useRef<HTMLInputElement>(null);
     const modelRef = useRef<HTMLInputElement>(null);
     const licensePlateRef = useRef<HTMLInputElement>(null);
@@ -23,116 +39,46 @@ export default function Page() {
     const availableRef = useRef<HTMLInputElement>(null);
 
     const [vehicles, setVehicles] = useState<any[]>([]);
-    const [showModal, setShowModal] = useState(false);
     const [fuelTypes, setFuelTypes] = useState<any[]>([]);
     const [transmissions, setTransmissions] = useState<any[]>([]);
     const [agencies, setAgencies] = useState<any[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
 
-    // Fetch all vehicles
-    const getAllVehicles = async () => {
+    const router = require('next/router').useRouter();
+
+    // Fetch all data async
+    const fetchAllData = async () => {
+        setLoading(true);
         try {
-            const response = await fetch(`${process.env.backendAPI}/api/vehicles`, {
-                method: 'GET',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
+            const [vehRes, fuelRes, transRes, agRes] = await Promise.all([
+                fetch(`${process.env.backendAPI}/api/vehicles`, { credentials: 'include' }),
+                fetch(`${process.env.backendAPI}/api/fueltype`, { credentials: 'include' }),
+                fetch(`${process.env.backendAPI}/api/transmission`, { credentials: 'include' }),
+                fetch(`${process.env.backendAPI}/api/agency`, { credentials: 'include' }),
+            ]);
 
-            if (!response.ok) {
-                const data = await response.json();
-                if (response.status === 500) {
-                    console.error('Server error:', data.message);
-                    return;
-                }
-            } else {
-                const data = await response.json();
-                return data;
-            }
-        } catch (error) {
-            console.error('Error fetching vehicles:', error);
+            const vehData = vehRes.ok ? await vehRes.json() : [];
+            const fuelData = fuelRes.ok ? await fuelRes.json() : [];
+            const transData = transRes.ok ? await transRes.json() : [];
+            const agData = agRes.ok ? await agRes.json() : [];
+
+            setVehicles(vehData);
+            setFuelTypes(fuelData);
+            setTransmissions(transData);
+            setAgencies(agData);
+        } catch {
+            toast.error("Erreur lors du chargement des données.");
+        } finally {
+            setLoading(false);
         }
     };
 
-    // Fetch all agencies
-    const getAllAgencies = async () => {
-        try {
-            const response = await fetch(`${process.env.backendAPI}/api/agency`, {
-                method: 'GET',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            if (!response.ok) {
-                const data = await response.json();
-                if (response.status === 500) {
-                    console.error('Server error:', data.message);
-                    return;
-                }
-            } else {
-                const data = await response.json();
-                return data;
-            }
-        } catch (error) {
-            console.error('Error fetching agencies:', error);
-        }
-    };
-
-    // Fetch all fuel types
-    const getAllFuelTypes = async () => {
-        try {
-            const response = await fetch(`${process.env.backendAPI}/api/fueltype`, {
-                method: 'GET',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-            if (response.ok) {
-                const data = await response.json();
-                setFuelTypes(data);
-            }
-        } catch (error) {
-            console.error('Error fetching fuel types:', error);
-        }
-    };
-
-    // Fetch all transmissions
-    const getAllTransmissions = async () => {
-        try {
-            const response = await fetch(`${process.env.backendAPI}/api/transmission`, {
-                method: 'GET',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-            if (response.ok) {
-                const data = await response.json();
-                setTransmissions(data);
-            }
-        } catch (error) {
-            console.error('Error fetching transmissions:', error);
-        }
-    };
     useEffect(() => {
-        const fetchVehicles = async () => {
-            const data = await getAllVehicles();
-            if (data) setVehicles(data);
-        };
-        const fetchAgencies = async () => {
-            const data = await getAllAgencies();
-            if (data) setAgencies(data);
-        };
-        fetchVehicles();
-        getAllFuelTypes();
-        getAllTransmissions();
-        fetchAgencies();
+        fetchAllData();
     }, []);
 
-    // Add vehicle using refs (no rerender on input)
     const handleAddVehicle = async () => {
         const newVehicle = {
             brand: brandRef.current?.value || '',
@@ -151,342 +97,303 @@ export default function Page() {
             const response = await fetch(`${process.env.backendAPI}/api/vehicles`, {
                 method: 'POST',
                 credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newVehicle),
             });
 
             if (response.ok) {
                 const addedVehicle = await response.json();
-
-                console.log('Vehicle added:', addedVehicle);
-                
-                setVehicles([...vehicles, addedVehicle]);
+                setVehicles(prev => [...prev, addedVehicle]);
                 setShowModal(false);
-
-                // Reset refs
-                if (brandRef.current) brandRef.current.value = '';
-                if (modelRef.current) modelRef.current.value = '';
-                if (licensePlateRef.current) licensePlateRef.current.value = '';
-                if (mileageRef.current) mileageRef.current.value = '';
-                if (seatCountRef.current) seatCountRef.current.value = '';
-                if (fuelCapacityRef.current) fuelCapacityRef.current.value = '';
-                if (transmissionIdRef.current) transmissionIdRef.current.value = '';
-                if (fuelTypeIdRef.current) fuelTypeIdRef.current.value = '';
-                if (agencyIdRef.current) agencyIdRef.current.value = '';
-                if (availableRef.current) availableRef.current.checked = false;
-
                 toast.success('Véhicule ajouté avec succès !');
+
+                // Reset inputs
+                brandRef.current!.value = '';
+                modelRef.current!.value = '';
+                licensePlateRef.current!.value = '';
+                mileageRef.current!.value = '';
+                seatCountRef.current!.value = '';
+                fuelCapacityRef.current!.value = '';
+                transmissionIdRef.current!.value = '';
+                fuelTypeIdRef.current!.value = '';
+                agencyIdRef.current!.value = '';
+                availableRef.current!.checked = false;
             } else {
                 const errorData = await response.json();
-                toast.error('Erreur lors de l\'ajout du véhicule : ' + errorData.message);
-                console.error('Failed to add vehicle:', errorData.message);
+                toast.error('Erreur lors de l\'ajout : ' + errorData.message);
             }
-        } catch (error) {
-            console.error('Error adding vehicle:', error);
+        } catch {
+            toast.error('Erreur serveur lors de l\'ajout.');
         }
     };
 
-    // Suppression d'un véhicule individuellement
     const handleDeleteVehicle = async (vehicleId: number) => {
-        if (!window.confirm("Voulez-vous vraiment supprimer ce véhicule ?")) return;
+        if (!window.confirm('Voulez-vous vraiment supprimer ce véhicule ?')) return;
         try {
             const response = await fetch(`${process.env.backendAPI}/api/vehicles/${vehicleId}`, {
                 method: 'DELETE',
                 credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
             });
             if (response.ok) {
-                const updatedVehicles = await getAllVehicles();
-                if (updatedVehicles) {
-                    setVehicles(updatedVehicles);
-                }
                 toast.success('Véhicule supprimé avec succès');
+                fetchAllData();
             } else {
-                const deletedVehicle = await response.json();
-                toast.error('Erreur lors de la suppression du véhicule : ' + deletedVehicle.message);
+                const errorData = await response.json();
+                toast.error('Erreur lors de la suppression : ' + errorData.message);
             }
-        } catch (error) {
-            console.error('Erreur lors de la suppression:', error);
+        } catch {
+            toast.error('Erreur serveur lors de la suppression');
         }
     };
+
+    // Filter vehicles by search term
+    const filteredVehicles = vehicles.filter(v => {
+        if (!searchTerm) return true;
+        const lower = searchTerm.toLowerCase();
+        return (
+            (v.brand && v.brand.toLowerCase().includes(lower)) ||
+            (v.model && v.model.toLowerCase().includes(lower)) ||
+            (v.license_plate && v.license_plate.toLowerCase().includes(lower)) ||
+            (v.agency?.city && v.agency.city.toLowerCase().includes(lower))
+        );
+    });
+
+    // Count ecological vehicles
+    const ecoCount = vehicles.filter(v => ['Electrique', 'Hybride'].includes(v.fuel_type?.fuel_name)).length;
 
     return (
         <Layout>
             <ToastContainer />
-            <Container fluid>
-                <h1 className="mb-4">Gestion des véhicules:</h1>
-                <p className="mb-5 text-secondary fs-5">Gérez les véhicules de votre flotte ici.</p>
-                <div className="mb-4">
-                    <Row className="w-100 justify-content-between align-items-center">
-                        <Col xs={6} className="d-flex align-items-center flex-nowrap mb-3">
-                            <h4 className="fs-2 fs-sm-3 fs-md-4 fs-lg-5 fs-xl-6">
-                                Tous les véhicules
-                            </h4>
-                        </Col>
-                        <Col xs={6} className="d-flex justify-content-end align-items-center flex-nowrap mb-3">
-                            <Button variant="primary" className='text-light' onClick={() => setShowModal(true)}>
-                                <FaPlus className="me-2" />
-                                Ajouter un véhicule
-                            </Button>
-                        </Col>
-                        <Col xs={12} className="d-flex flex-wrap gap-3 mb-4 dashboard-cards-row">
-                            {[
-                                { title: "Total Véhicules", value: vehicles.length, className: "dashboard-card-dark" },
-                                { title: "Disponibles", value: vehicles.filter(v => v.available).length || 0, className: "dashboard-card-light" },
-                                { title: "Ecologiques 🍃", value: vehicles.filter(v => v.fuel === 'Electrique' || v.fuel === 'Hybrid').length || 0, className: "dashboard-card-light" },
-                            ].map((stat, index) => (
-                                <Card
-                                    key={index}
-                                    className={`dashboard-card ${stat.className} flex-grow-1`}
-                                >
-                                    <Card.Body className="p-3">
-                                        <div className="d-flex justify-content-between align-items-center">
-                                            <span className="dashboard-card-title">{stat.title}</span>
-                                        </div>
-                                        <div className="dashboard-card-value mt-2">{stat.value}</div>
-                                    </Card.Body>
-                                </Card>
-                            ))}
-                        </Col>
-                        <Col xs={12} className="d-flex flex-wrap">
-                            <Form className="d-flex me-2 mb-2 w-100">
-                                <div className="position-relative w-100">
-                                    <FormControl
-                                        type="search"
-                                        placeholder="Rechercher"
-                                        className="py-3 pe-5 rounded-lg w-100"
-                                        aria-label="Search"
-                                    />
-                                    <FaSearch
-                                        className="position-absolute top-50 end-0 translate-middle-y me-3 text-secondary"
-                                    />
+            <Container fluid className="py-4">
+                <h2 className="fw-bold mb-3">Gestion des véhicules</h2>
+                <p className="mb-4 text-muted">Gérez les véhicules de votre flotte facilement.</p>
+
+                <Row className="mb-4 g-3">
+                    <Col md={4}>
+                        <Card className="shadow-sm">
+                            <Card.Body className="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <div className="text-uppercase text-muted small">Total véhicules</div>
+                                    <div className="fs-3 fw-bold">{vehicles.length}</div>
                                 </div>
-                            </Form>
-                        </Col>
-                        <Col xs={12} className="d-flex justify-content-end align-items-center flex-wrap gap-2">
-                            <Button variant="secondary" className="me-2">
-                                <FaArrowsRotate className="me-0 me-lg-2" />
-                                <span className="d-lg-inline d-none">Annuler</span>
-                            </Button>
-                            <Dropdown>
-                                <Dropdown.Toggle variant="secondary" id="dropdown-filter">
-                                    <FaFilter className="me-0 me-lg-2" />
-                                    <span className="d-lg-inline d-none">Filtre</span>
-                                </Dropdown.Toggle>
-                                <Dropdown.Menu>
-                                    <Dropdown.Item href="#">Marque A-Z</Dropdown.Item>
-                                    <Dropdown.Item href="#">Marque Z-A</Dropdown.Item>
-                                    <Dropdown.Divider />
-                                    <Dropdown.Item href="#">Année croissante</Dropdown.Item>
-                                    <Dropdown.Item href="#">Année décroissante</Dropdown.Item>
-                                </Dropdown.Menu>
-                            </Dropdown>
-                        </Col>
-                        <Col xs={12}>
-                            <div className="table-container">
-                                <table className="sparkotto-table">
-                                    <thead>
-                                        <tr>
-                                            <th>ID VEH</th>
-                                            <th>Marque</th>
-                                            <th>Model</th>
-                                            <th>Disponible</th>
-                                            <th>Carburant</th>
-                                            <th>Transmission</th>
-                                            <th>Agence</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {vehicles.map((vehicle, index) => (
-                                            <tr
-                                                key={index}
-                                                onClick={(e) => {
-                                                    if (
-                                                        (e.target as HTMLElement).tagName !== 'INPUT' &&
-                                                        (e.target as HTMLElement).tagName !== 'BUTTON' &&
-                                                        (e.target as HTMLElement).tagName !== 'svg'
-                                                    ) {
-                                                        router.push(`/admin/vehicle/${vehicle.id_vehicle}/detail/`);
-                                                    }
-                                                }}
-                                                style={{ cursor: 'pointer' }}
-                                            >
-                                                <td><a href="#">{`SPK${vehicle.id_vehicle}`}</a></td>
-                                                <td>{vehicle.brand}</td>
-                                                <td>{vehicle.model}</td>
-                                                <td>{vehicle.available ? 'Oui' : 'Non'}</td>
-                                                <td>{vehicle.fuel_type?.fuel_name}</td>
-                                                <td>{vehicle.transmission?.transmission_type}</td>
-                                                <td>{vehicle.agency?.city}</td>
-                                                <td>
+                                <FaCar size={36} className="text-primary" />
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                    <Col md={4}>
+                        <Card className="shadow-sm">
+                            <Card.Body className="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <div className="text-uppercase text-success small">Disponibles</div>
+                                    <div className="fs-3 fw-bold">{vehicles.filter(v => v.available).length}</div>
+                                </div>
+                                <FaLeaf size={36} className="text-success" />
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                    <Col md={4}>
+                        <Card className="shadow-sm">
+                            <Card.Body className="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <div className="text-uppercase text-info small">Écologiques</div>
+                                    <div className="fs-3 fw-bold">{ecoCount}</div>
+                                </div>
+                                <FaLeaf size={36} className="text-info" />
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                </Row>
+
+                <Row className="align-items-center mb-3">
+                    <Col md={8} className="mb-2 mb-md-0">
+                        <FormControl
+                            placeholder="Rechercher par marque, modèle, immatriculation, agence..."
+                            value={searchTerm}
+                            onChange={e => setSearchTerm(e.target.value)}
+                            aria-label="Recherche véhicules"
+                            size="lg"
+                        />
+                    </Col>
+                    <Col md={4} className="text-md-end">
+                        <Button variant="purple" onClick={() => setShowModal(true)}>
+                            <FaPlus className="me-2" />
+                            Ajouter un véhicule
+                        </Button>
+                    </Col>
+                </Row>
+
+                <Card className="shadow-sm">
+                    <Card.Header className="fw-bold">Liste des véhicules</Card.Header>
+                    <Card.Body className="p-0">
+                        {loading ? (
+                            <div className="text-center py-5">
+                                <Spinner animation="border" />
+                            </div>
+                        ) : filteredVehicles.length === 0 ? (
+                            <div className="text-center py-5 text-muted">Aucun véhicule trouvé.</div>
+                        ) : (
+                            <Table responsive hover className="mb-0 align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Marque</th>
+                                        <th>Modèle</th>
+                                        <th>Immatriculation</th>
+                                        <th>Disponible</th>
+                                        <th>Carburant</th>
+                                        <th>Transmission</th>
+                                        <th>Agence</th>
+                                        <th className="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredVehicles.map(vehicle => (
+                                        <tr key={vehicle.id_vehicle}
+                                        style={{ cursor: 'pointer' }}
+                                        onClick={(e) => {
+                                            // Éviter la redirection si clic sur bouton, SVG ou INPUT (ex: checkbox)
+                                            const targetTag = (e.target as HTMLElement).tagName;
+                                            if (targetTag !== 'BUTTON' && targetTag !== 'SVG' && targetTag !== 'INPUT') {
+                                            router.push(`/admin/vehicle/${vehicle.id_vehicle}/detail/`);
+                                            }
+                                        }}>
+                                            <td>{`SPK${vehicle.id_vehicle}`}</td>
+                                            <td>{vehicle.brand}</td>
+                                            <td>{vehicle.model}</td>
+                                            <td>{vehicle.license_plate}</td>
+                                            <td>
+                                                {vehicle.available ? (
+                                                    <Badge bg="success" className="d-inline-flex align-items-center">
+                                                        <FaCheckCircle className="me-1" />
+                                                        Oui
+                                                    </Badge>
+                                                ) : (
+                                                    <Badge bg="danger" className="d-inline-flex align-items-center">
+                                                        <FaTimesCircle className="me-1" />
+                                                        Non
+                                                    </Badge>
+                                                )}
+                                            </td>
+                                            <td>{vehicle.fuel_type?.fuel_name || '-'}</td>
+                                            <td>{vehicle.transmission?.transmission_type || '-'}</td>
+                                            <td>{vehicle.agency?.city || '-'}</td>
+                                            <td className="text-center">
+                                                <Stack direction="horizontal" gap={2} className="justify-content-center">
                                                     <Button
-                                                        variant="danger"
+                                                        variant="outline-danger"
                                                         size="sm"
-                                                        onClick={e => {
-                                                            e.stopPropagation();
-                                                            handleDeleteVehicle(vehicle.id_vehicle);
-                                                        }}
-                                                        title="Supprimer ce véhicule"
+                                                        onClick={() => handleDeleteVehicle(vehicle.id_vehicle)}
+                                                        title="Supprimer"
                                                     >
                                                         <FaTrash />
                                                     </Button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </Col>
-                    </Row>
-                </div>
-            </Container>
+                                                </Stack>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </Table>
+                        )}
+                    </Card.Body>
+                </Card>
 
-            {/* Modal for adding a vehicle */}
-            <Modal show={showModal} onHide={() => setShowModal(false)} centered>
-                <Modal.Header closeButton className="bg-purple text-light">
-                    <Modal.Title>Ajouter un véhicule</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form>
-                        <Row className="gy-3">
-                            <Col xs={12} md={6}>
-                                <Form.Group>
-                                    <Form.Label>Marque</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Entrez la marque"
-                                        ref={brandRef}
-                                    />
-                                </Form.Group>
-                            </Col>
-                            <Col xs={12} md={6}>
-                                <Form.Group>
-                                    <Form.Label>Modèle</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Entrez le modèle"
-                                        ref={modelRef}
-                                    />
-                                </Form.Group>
-                            </Col>
-                            <Col xs={12} md={6}>
-                                <Form.Group>
-                                    <Form.Label>Immatriculation</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Entrez l'immatriculation"
-                                        ref={licensePlateRef}
-                                    />
-                                </Form.Group>
-                            </Col>
-                            <Col xs={12} md={6}>
-                                <Form.Group>
-                                    <Form.Label>Kilométrage</Form.Label>
-                                    <Form.Control
-                                        type="number"
-                                        placeholder="Entrez le kilométrage"
-                                        ref={mileageRef}
-                                    />
-                                </Form.Group>
-                            </Col>
-                            <Col xs={12} md={6}>
-                                <Form.Group>
-                                    <Form.Label>Nombre de sièges</Form.Label>
-                                    <Form.Control
-                                        type="number"
-                                        placeholder="Entrez le nombre de sièges"
-                                        ref={seatCountRef}
-                                    />
-                                </Form.Group>
-                            </Col>
-                            <Col xs={12} md={6}>
-                                <Form.Group>
-                                    <Form.Label>Capacité du réservoir</Form.Label>
-                                    <Form.Control
-                                        type="number"
-                                        placeholder="Entrez la capacité (litres)"
-                                        ref={fuelCapacityRef}
-                                    />
-                                </Form.Group>
-                            </Col>
-                            <Col xs={12} md={6}>
-                                <Form.Group>
-                                    <Form.Label>Transmission</Form.Label>
-                                    <Form.Select
-                                        ref={transmissionIdRef}
-                                        defaultValue=""
-                                        aria-label="Sélectionnez une transmission"
-                                    >
-                                        <option value="">Sélectionnez une transmission</option>
-                                        {transmissions.map((trans: any) => (
-                                            <option key={trans.id_transmission} value={trans.id_transmission}>
-                                                {trans.transmission_type}
-                                            </option>
-                                        ))}
-                                    </Form.Select>
-                                </Form.Group>
-                            </Col>
-                            <Col xs={12} md={6}>
-                                <Form.Group>
-                                    <Form.Label>Type de carburant</Form.Label>
-                                    <Form.Select
-                                        ref={fuelTypeIdRef}
-                                        defaultValue=""
-                                        aria-label="Sélectionnez un type de carburant"
-                                    >
-                                        <option value="">Sélectionnez un type</option>
-                                        {fuelTypes.map((fuel: any) => (
-                                            <option key={fuel.id_fuel} value={fuel.id_fuel}>
-                                                {fuel.fuel_name}
-                                            </option>
-                                        ))}
-                                    </Form.Select>
-                                </Form.Group>
-                            </Col>
-                            <Col xs={12} md={12}>
-                                <Form.Group>
-                                    <Form.Label>Agence</Form.Label>
-                                    <Form.Select
-                                        ref={agencyIdRef}
-                                        defaultValue=""
-                                        aria-label="Sélectionnez une agence"
-                                    >
-                                        <option value="">Sélectionnez une agence</option>
-                                        {agencies.map((agency: any) => (
-                                            <option key={agency.id_agency} value={agency.id_agency}>
-                                                {agency.city}
-                                            </option>
-                                        ))}
-                                    </Form.Select>
-                                </Form.Group>
-                            </Col>
-                            <Col xs={12} md={6}>
-                                <Form.Group>
-                                    <Form.Label>Disponibilité</Form.Label>
-                                    <Form.Check
-                                        type="checkbox"
-                                        ref={availableRef}
-                                        label="Disponible"
-                                    />
-                                </Form.Group>
-                            </Col>
-                        </Row>
-                    </Form>
-                </Modal.Body>
-                <Modal.Footer className="d-flex justify-content-between">
-                    <Button variant="secondary" onClick={() => setShowModal(false)}>
-                        Annuler
-                    </Button>
-                    <Button variant="yellow" onClick={handleAddVehicle}>
-                        Ajouter
-                    </Button>
-                </Modal.Footer>
-            </Modal>
+
+                {/* Add Vehicle Modal */}
+                <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+                    <Modal.Header closeButton className="bg-purple text-white">
+                        <Modal.Title>Ajouter un véhicule</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Form>
+                            <Row className="g-3">
+                                <Col md={6}>
+                                    <Form.Group controlId="brand">
+                                        <Form.Label>Marque</Form.Label>
+                                        <Form.Control type="text" placeholder="Marque" ref={brandRef} />
+                                    </Form.Group>
+                                </Col>
+                                <Col md={6}>
+                                    <Form.Group controlId="model">
+                                        <Form.Label>Modèle</Form.Label>
+                                        <Form.Control type="text" placeholder="Modèle" ref={modelRef} />
+                                    </Form.Group>
+                                </Col>
+                                <Col md={6}>
+                                    <Form.Group controlId="licensePlate">
+                                        <Form.Label>Immatriculation</Form.Label>
+                                        <Form.Control type="text" placeholder="Immatriculation" ref={licensePlateRef} />
+                                    </Form.Group>
+                                </Col>
+                                <Col md={6}>
+                                    <Form.Group controlId="mileage">
+                                        <Form.Label>Kilométrage</Form.Label>
+                                        <Form.Control type="number" placeholder="Kilométrage" ref={mileageRef} />
+                                    </Form.Group>
+                                </Col>
+                                <Col md={6}>
+                                    <Form.Group controlId="seatCount">
+                                        <Form.Label>Nombre de sièges</Form.Label>
+                                        <Form.Control type="number" placeholder="Nombre de sièges" ref={seatCountRef} />
+                                    </Form.Group>
+                                </Col>
+                                <Col md={6}>
+                                    <Form.Group controlId="fuelCapacity">
+                                        <Form.Label>Capacité du réservoir (L)</Form.Label>
+                                        <Form.Control type="number" placeholder="Capacité carburant" ref={fuelCapacityRef} />
+                                    </Form.Group>
+                                </Col>
+                                <Col md={6}>
+                                    <Form.Group controlId="transmissionId">
+                                        <Form.Label>Transmission</Form.Label>
+                                        <Form.Select ref={transmissionIdRef} defaultValue="">
+                                            <option value="">Sélectionnez une transmission</option>
+                                            {transmissions.map(t => (
+                                                <option key={t.id_transmission} value={t.id_transmission}>
+                                                    {t.transmission_type}
+                                                </option>
+                                            ))}
+                                        </Form.Select>
+                                    </Form.Group>
+                                </Col>
+                                <Col md={6}>
+                                    <Form.Group controlId="fuelTypeId">
+                                        <Form.Label>Type de carburant</Form.Label>
+                                        <Form.Select ref={fuelTypeIdRef} defaultValue="">
+                                            <option value="">Sélectionnez un type</option>
+                                            {fuelTypes.map(f => (
+                                                <option key={f.id_fuel} value={f.id_fuel}>
+                                                    {f.fuel_name}
+                                                </option>
+                                            ))}
+                                        </Form.Select>
+                                    </Form.Group>
+                                </Col>
+                                <Col md={12}>
+                                    <Form.Group controlId="agencyId">
+                                        <Form.Label>Agence</Form.Label>
+                                        <Form.Select ref={agencyIdRef} defaultValue="">
+                                            <option value="">Sélectionnez une agence</option>
+                                            {agencies.map(a => (
+                                                <option key={a.id_agency} value={a.id_agency}>
+                                                    {a.city}
+                                                </option>
+                                            ))}
+                                        </Form.Select>
+                                    </Form.Group>
+                                </Col>
+                                <Col md={6} className="d-flex align-items-center my-2">
+                                    <Form.Check type="checkbox" label="Disponible" ref={availableRef} />
+                                </Col>
+                            </Row>
+                        </Form>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setShowModal(false)}>Annuler</Button>
+                        <Button variant="yellow" onClick={handleAddVehicle}>Ajouter</Button>
+                    </Modal.Footer>
+                </Modal>
+            </Container>
         </Layout>
     );
 }

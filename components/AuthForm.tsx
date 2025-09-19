@@ -7,11 +7,11 @@ import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Logo from './Logo';
 import Link from 'next/link';
 import { ToastContainer, toast } from 'react-toastify';
 import { useRouter } from 'next/router';
 import Cookies from 'js-cookie'
+import Logo from '../components/Logo';
 
 
 export default function AuthForm() {

@@ -4,9 +4,9 @@ import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
-import Logo from './Logo';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import Logo from '../components/Logo';
 
 export default function Sidebar() {
   const [show, setShow] = useState(false);
@@ -20,7 +20,7 @@ export default function Sidebar() {
     <>
       <div className="text-center mb-4">
         <Link href="/" className="text-decoration-none text-white">
-            <Logo />
+          <Logo />
         </Link>
       </div>
       <Nav className="flex-column">
