@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Form, Button } from 'react-bootstrap';
-import Logo from './Logo';
+import { Form, Button, Image } from 'react-bootstrap';
 import Link from 'next/link';
+import Logo from '../components/Logo';
 
 export default function DoubleAuth() {
   const [code, setCode] = useState('');

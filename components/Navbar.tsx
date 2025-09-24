@@ -4,7 +4,9 @@ import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
-import Logo from './Logo';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import Logo from '../components/Logo';
 
 export default function Sidebar() {
   const [show, setShow] = useState(false);
@@ -12,30 +14,54 @@ export default function Sidebar() {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
+  const router = useRouter();
+
   const SidebarContent = () => (
     <>
       <div className="text-center mb-4">
-        <Logo />
+        <Link href="/" className="text-decoration-none text-white">
+          <Logo />
+        </Link>
       </div>
       <Nav className="flex-column">
-        <Button variant="yellow" className="mb-3 text-dark">
-          Réserver un Véhicule
-        </Button>
-        <Button variant="yellow" className="mb-3 text-dark">
-          Ajouter un véhicule
-        </Button>
-        <Button variant="yellow" className="mb-3 text-dark">
-          Mes trajets à venir
-        </Button>
+        {router.pathname.startsWith('/admin') ? (
+          <>
+            <Button type="button" variant="yellow" className="mb-3 text-dark" onClick={() => router.push('/admin/user')}>
+              Gérer les utilisateurs
+            </Button>
+            <Button type="button" variant="yellow" className="mb-3 text-dark" onClick={() => router.push('/admin/vehicle/show')}>
+              Gérer les véhicules
+            </Button>
+            <Button type="button" variant="yellow" className="mb-3 text-dark" onClick={() => router.push('/admin/reservation/show')}>
+              Gérer les réservations
+            </Button>
+            <Button type="button" variant="yellow" className="mb-3 text-dark" onClick={() => router.push('/admin/agency/show')}>
+              Gérer les agences
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button type="button" variant="yellow" className="mb-3 text-dark" onClick={() => router.push('/dashboard')}>
+              Mes trajets à venir
+            </Button>
+            <Button type="button" variant="yellow" className="mb-3 text-dark" onClick={() => router.push('/reservation')}>
+              Réserver un Véhicule
+            </Button>
+          </>
+        )}
       </Nav>
     </>
   );
 
   return (
     <>
-      <Navbar bg="purple" expand={false} className="mb-3 d-md-none">
+      <Navbar bg="purple" expand={false} className="mb-3 d-lg-none">
         <Container fluid>
-          <Navbar.Brand href="#"><Logo /></Navbar.Brand>
+          <Navbar.Brand>
+            <Link href="/" className="text-decoration-none text-white">
+              <Logo />
+            </Link>
+          </Navbar.Brand>
           <Navbar.Toggle aria-controls="offcanvasNavbar" onClick={handleShow} className="bg-yellow" />
           <Navbar.Offcanvas
             id="offcanvasNavbar"
@@ -43,7 +69,7 @@ export default function Sidebar() {
             placement="start"
             show={show}
             onHide={handleClose}
-            className="bg-purple relative"
+            className="bg-purple"
           >
             <Offcanvas.Header closeButton>
               <Offcanvas.Title id="offcanvasNavbarLabel"></Offcanvas.Title>
@@ -55,7 +81,7 @@ export default function Sidebar() {
         </Container>
       </Navbar>
 
-      <div className="d-none d-md-flex flex-column bg-purple vh-100 p-3">
+      <div className="d-none d-lg-flex flex-column bg-purple vh-100 p-3">
         <SidebarContent />
       </div>
     </>
