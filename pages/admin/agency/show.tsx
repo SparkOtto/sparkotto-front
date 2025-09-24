@@ -11,11 +11,9 @@ import {
     Modal,
     Badge,
     FormControl,
-    Dropdown,
-    Stack,
     Spinner,
 } from 'react-bootstrap';
-import { FaPlus, FaTrash, FaFilter, FaArrowsRotate, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
+import { FaPlus, FaTrash, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import { useRouter } from 'next/router';
 import { ToastContainer, toast } from 'react-toastify';
 

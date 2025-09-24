@@ -3,7 +3,7 @@ export type Vehicle = {
     id_vehicle: number;
     brand: string;
     model: string;
-    fuel_type: { fuel_name: string };
+    fuel_type: { id_fuel: number, fuel_name: string };
     fuelTypeId: number;
     license_plate: string;
     mileage: number;
@@ -11,13 +11,14 @@ export type Vehicle = {
     agency_id: number;
     available: boolean;
     fuel_capacity?: number;
-    transmission: { transmission_type: string };
+    transmission: { id_transmission: number, transmission_type: string };
     transmissionId: number;
     reservedSeats: number;
     image?: string;
     trips: Trip[];
     keys: Key[];
     state_records: StateRecord[];
+    agency: Agency;
 };
 
 export type StateRecord = {

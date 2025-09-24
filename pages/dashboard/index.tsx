@@ -303,7 +303,7 @@ export default function Dashboard() {
                                                                 className='text-white'
                                                                 onClick={e => {
                                                                     e.preventDefault();
-                                                                    handleVehicleStateSubmit(selectedTrip, vehicleBackState);
+                                                                    handleVehicleStateSubmit(selectedTrip);
                                                                 }}
                                                             >
                                                                 Enregistrer l'état des lieux
