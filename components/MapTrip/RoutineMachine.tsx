@@ -1,6 +1,7 @@
-import L from "leaflet";
 import { createControlComponent } from "@react-leaflet/core";
-import "leaflet-routing-machine";
+import 'leaflet';
+import 'leaflet-routing-machine';
+declare let L;
 
 
 const createRoutingMachineLayer = (props: any) => {

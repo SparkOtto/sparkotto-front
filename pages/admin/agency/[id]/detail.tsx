@@ -107,12 +107,7 @@ export default function AgencyDetail() {
     );
   }
 
-  const isHeadOffice =
-    agency.head_office === true ||
-    agency.head_office === 'oui' ||
-    agency.head_office === 'true' ||
-    agency.head_office === '1' ||
-    agency.head_office === 1;
+  const isHeadOffice = agency.head_office === true
 
   return (
     <Layout>
