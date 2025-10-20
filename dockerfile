@@ -1,6 +1,6 @@
 # Étape 1 : Build de l'application Next.js
 FROM node:lts-alpine AS build
-
+RUN apk add --no-cache git
 WORKDIR /app
 
 COPY package.json package-lock.json ./
