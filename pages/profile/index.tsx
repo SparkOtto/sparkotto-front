@@ -43,7 +43,7 @@ export default function Profile() {
 
         const updateProfile = async () => {
             try {
-                const response = await fetch(`${process.env.backendAPI}/api/user/${user.id}`, {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user/${user.id}`, {
                     method: 'PUT',
                     credentials: 'include',
                     headers: {
@@ -88,7 +88,7 @@ export default function Profile() {
 
         const changePassword = async () => {
             try {
-                const response = await fetch(`${process.env.backendAPI}/api/user/change-password/${user.id}`, {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user/change-password/${user.id}`, {
                     method: 'POST',
                     credentials: 'include',
                     headers: {

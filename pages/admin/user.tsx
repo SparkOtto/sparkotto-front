@@ -42,7 +42,7 @@ export default function Page() {
   // API Fetch
   const getAllUsers = async () => {
     try {
-      const response = await fetch(`${process.env.backendAPI}/api/user`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user`, {
         method: "GET",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -86,7 +86,7 @@ export default function Page() {
     }
     try {
       const response = await fetch(
-        `${process.env.backendAPI}/api/admin/toggleUserStatus/${userId}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/toggleUserStatus/${userId}`,
         {
           method: "PUT",
           credentials: "include",
@@ -111,7 +111,7 @@ export default function Page() {
         toast.error("Vous ne pouvez pas bloquer ou débloquer votre propre compte.");
         return;
       }
-      const response = await fetch(`${process.env.backendAPI}/api/admin/lockUnlockUser`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/lockUnlockUser`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

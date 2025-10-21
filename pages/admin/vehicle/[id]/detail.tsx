@@ -34,9 +34,9 @@ export default function VehicleDetail() {
     useEffect(() => {
         const fetchLists = async () => {
             const [fuelRes, transRes, agencyRes] = await Promise.all([
-                fetch(`${process.env.backendAPI}/api/fueltype`, { credentials: 'include' }),
-                fetch(`${process.env.backendAPI}/api/transmission`, { credentials: 'include' }),
-                fetch(`${process.env.backendAPI}/api/agency`, { credentials: 'include' }),
+                fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/fueltype`, { credentials: 'include' }),
+                fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/transmission`, { credentials: 'include' }),
+                fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/agency`, { credentials: 'include' }),
             ]);
             if (fuelRes.ok) setFuelTypes(await fuelRes.json());
             if (transRes.ok) setTransmissions(await transRes.json());
@@ -48,7 +48,7 @@ export default function VehicleDetail() {
     useEffect(() => {
         if (!id) return;
         setLoading(true);
-        fetch(`${process.env.backendAPI}/api/vehicles/${id}`, { credentials: 'include' })
+        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/vehicles/${id}`, { credentials: 'include' })
             .then(res => {
                 if (!res.ok) throw new Error('Véhicule introuvable');
                 return res.json();
@@ -79,7 +79,7 @@ export default function VehicleDetail() {
         };
 
         try {
-            const response = await fetch(`${process.env.backendAPI}/api/vehicles/${id}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/vehicles/${id}`, {
                 method: 'PUT',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },

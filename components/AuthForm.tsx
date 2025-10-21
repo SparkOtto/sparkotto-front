@@ -24,7 +24,7 @@ export default function AuthForm() {
     const password = (event.target as any).formBasicPassword.value;
 
     try {
-      const response = await fetch(`${process.env.backendAPI}/api/auth/login`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/login`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -72,7 +72,7 @@ export default function AuthForm() {
     const password = (event.target as any).formBasicPassword.value;
 
     try {
-      const response = await fetch(`${process.env.backendAPI}/api/auth/register`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -25,7 +25,7 @@ export default function AgencyDetail() {
   const headOfficeRef = useRef<HTMLInputElement>(null);
 
   const fetchAgencyById = async (agencyId: string | string[] | undefined) => {
-    const res = await fetch(`${process.env.backendAPI}/api/agency/${agencyId}`, { credentials: 'include' });
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/agency/${agencyId}`, { credentials: 'include' });
     if (!res.ok) {
       throw new Error('Agence introuvable');
     }
@@ -64,7 +64,7 @@ export default function AgencyDetail() {
     };
 
     try {
-      const response = await fetch(`${process.env.backendAPI}/api/agency/${id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/agency/${id}`, {
         method: 'PUT',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },

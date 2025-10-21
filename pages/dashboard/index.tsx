@@ -29,7 +29,7 @@ export default function Dashboard() {
     })
 
     useEffect(() => {
-        fetch(`${process.env.backendAPI}/api/trip/my/${userId}`,
+        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/trip/my/${userId}`,
             {
                 method: 'GET',
                 credentials: 'include',
@@ -77,7 +77,7 @@ export default function Dashboard() {
     }
 
     const handleVehicleStateSubmit = async (selectedTrip : Trip) => {
-        const updateKMVehicle = await fetch(`${process.env.backendAPI}/api/vehicles/${selectedTrip.vehicle.id_vehicle}`, {
+        const updateKMVehicle = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/vehicles/${selectedTrip.vehicle.id_vehicle}`, {
             method: 'PUT',
             credentials: 'include',
             headers: {
@@ -92,7 +92,7 @@ export default function Dashboard() {
             const updateKMVehicleData = await updateKMVehicle.json();
 
             // Mettre à jour le statut de la réservation
-            const vehicleState = await fetch(`${process.env.backendAPI}/api/vehicleState`, {
+            const vehicleState = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/vehicleState`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
@@ -108,7 +108,7 @@ export default function Dashboard() {
             });
 
             if (vehicleState.ok) {
-                const updateTrip = await fetch(`${process.env.backendAPI}/api/trip/${selectedTrip.id_trip}`, {
+                const updateTrip = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/trip/${selectedTrip.id_trip}`, {
                     method: 'PUT',
                     credentials: 'include',
                     headers: {
@@ -130,7 +130,7 @@ export default function Dashboard() {
                     });
                     // Mettre à jour la liste des trajets
                     setLoading(true);
-                    fetch(`${process.env.backendAPI}/api/trip/my/${userId}`, {
+                    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/trip/my/${userId}`, {
                         method: 'GET',
                         credentials: 'include',
                         headers: {

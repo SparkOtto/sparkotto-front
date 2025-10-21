@@ -30,7 +30,7 @@ export default function CustomNavbar() {
   // appel API pour le logout
   const handleLogout = async () => {
     try {
-      const response = await fetch(`${process.env.backendAPI}/api/auth/logout`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/logout`, {
         method: 'POST',
         credentials: 'include',
         headers: {

@@ -6,9 +6,6 @@ const nextConfig = {
     sassOptions: {
       includePaths: [path.join(__dirname, 'public/styles')],
     },
-    env: {
-      backendAPI: 'http://localhost:3001',
-    },
 };
   
 module.exports = nextConfig;

@@ -14,7 +14,7 @@ const ECO_FUELS = ["Hybride", "Electrique"];
 
 const fetchVehicles = async (): Promise<Vehicle[]> => {
   try {
-    const response = await fetch(`${process.env.backendAPI}/api/vehicles`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/vehicles`, {
       method: "GET",
       credentials: "include",
       headers: {
@@ -41,7 +41,7 @@ const fetchVehicles = async (): Promise<Vehicle[]> => {
 
 const fetchAgencies = async (): Promise<Agency[]> => {
   try {
-    const response = await fetch(`${process.env.backendAPI}/api/agency`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/agency`, {
       method: "GET",
       credentials: "include",
       headers: {
@@ -196,7 +196,7 @@ const VehicleReservationPage: React.FC = () => {
 
   const handleCarpooling = async (id_trip: number) => {
     const goCarpooling = await fetch(
-      `${process.env.backendAPI}/api/carpooling`,
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/carpooling`,
       {
         method: "POST",
         credentials: "include",
@@ -299,7 +299,7 @@ const VehicleReservationPage: React.FC = () => {
     };
 
     try {
-      const response = await fetch(`${process.env.backendAPI}/api/trip`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/trip`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -319,7 +319,7 @@ const VehicleReservationPage: React.FC = () => {
         }
       } else {
         const vehicleCleanlinessState = await fetch(
-          `${process.env.backendAPI}/api/vehicleState`,
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/vehicleState`,
           {
             method: "POST",
             credentials: "include",

@@ -53,10 +53,10 @@ export default function VehicleManagement() {
         setLoading(true);
         try {
             const [vehRes, fuelRes, transRes, agRes] = await Promise.all([
-                fetch(`${process.env.backendAPI}/api/vehicles`, { credentials: 'include' }),
-                fetch(`${process.env.backendAPI}/api/fueltype`, { credentials: 'include' }),
-                fetch(`${process.env.backendAPI}/api/transmission`, { credentials: 'include' }),
-                fetch(`${process.env.backendAPI}/api/agency`, { credentials: 'include' }),
+                fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/vehicles`, { credentials: 'include' }),
+                fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/fueltype`, { credentials: 'include' }),
+                fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/transmission`, { credentials: 'include' }),
+                fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/agency`, { credentials: 'include' }),
             ]);
 
             const vehData = vehRes.ok ? await vehRes.json() : [];
@@ -94,7 +94,7 @@ export default function VehicleManagement() {
         };
 
         try {
-            const response = await fetch(`${process.env.backendAPI}/api/vehicles`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/vehicles`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
@@ -130,7 +130,7 @@ export default function VehicleManagement() {
     const handleDeleteVehicle = async (vehicleId: number) => {
         if (!window.confirm('Voulez-vous vraiment supprimer ce véhicule ?')) return;
         try {
-            const response = await fetch(`${process.env.backendAPI}/api/vehicles/${vehicleId}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/vehicles/${vehicleId}`, {
                 method: 'DELETE',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },

@@ -32,7 +32,7 @@ const ECO_FUELS = ["Hybride", "Electrique"];
 
 const fetchVehicles = async (): Promise<Vehicle[]> => {
     try {
-        const response = await fetch(`${process.env.backendAPI}/api/vehicles`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/vehicles`, {
             method: "GET",
             credentials: "include",
             headers: {
@@ -57,7 +57,7 @@ const fetchVehicles = async (): Promise<Vehicle[]> => {
 
 const fetchReservations = async (): Promise<Trip[]> => {
     try {
-        const response = await fetch(`${process.env.backendAPI}/api/trip`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/trip`, {
             method: "GET",
             credentials: "include",
             headers: {
@@ -140,7 +140,7 @@ const VehicleAdminDashboard: React.FC = () => {
     };
 
     const handleValidateReservation = (reservation: Trip) => {
-        fetch(`${process.env.backendAPI}/api/trip/${reservation.id_trip}`, {
+        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/trip/${reservation.id_trip}`, {
             method: "PUT",
             credentials: "include",
             headers: {
@@ -163,7 +163,7 @@ const VehicleAdminDashboard: React.FC = () => {
     };
 
     const handleRefuseReservation = (reservation: Trip) => {
-        fetch(`${process.env.backendAPI}/api/trip/${reservation.id_trip}`, {
+        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/trip/${reservation.id_trip}`, {
             method: "PUT",
             credentials: "include",
             headers: {

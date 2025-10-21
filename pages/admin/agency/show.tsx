@@ -35,7 +35,7 @@ export default function AgencyManagement() {
     const fetchAgencies = async () => {
         setLoading(true);
         try {
-            const response = await fetch(`${process.env.backendAPI}/api/agency`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/agency`, {
                 credentials: 'include',
             });
             if (response.ok) {
@@ -78,7 +78,7 @@ export default function AgencyManagement() {
                 head_office: headOfficeRef.current?.checked || false,
             };
 
-            const response = await fetch(`${process.env.backendAPI}/api/agency`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/agency`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
@@ -110,7 +110,7 @@ export default function AgencyManagement() {
     const handleDeleteAgency = async (id: number) => {
         if (!window.confirm('Voulez-vous vraiment supprimer cette agence ?')) return;
         try {
-            const response = await fetch(`${process.env.backendAPI}/api/agency/${id}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/agency/${id}`, {
                 method: 'DELETE',
                 credentials: 'include',
             });

@@ -12,7 +12,7 @@ export default function ForgotPassword() {
     e.preventDefault();
 
     try {
-      const response = await fetch(`${process.env.backendAPI}/api/auth/forgot-password`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/forgot-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
 
