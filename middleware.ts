@@ -11,7 +11,7 @@ export function middleware(request: NextRequest) {
         '/admin': ['admin'],
     };
 
-    const isProtectedRoute = Object.keys(protectedRoutes).some((route) => pathname.startsWith(route));
+    const isProtectedRoute = Object.keys(protectedRoutes).some((route) => pathname === route || pathname.startsWith(route + '/'));
 
     const authToken = request.cookies.get('token');
     let userRole = null;
@@ -36,9 +36,14 @@ export function middleware(request: NextRequest) {
             return NextResponse.redirect(new URL('/', request.url));
         }
         
-        if (!userRole || !protectedRoutes[pathname].includes(userRole)) {
+        const matchedRoute = Object.keys(protectedRoutes).find(route => 
+            pathname === route || pathname.startsWith(route + '/')
+        );
+        
+        if (matchedRoute && (!userRole || !protectedRoutes[matchedRoute].includes(userRole))) {
             return NextResponse.redirect(new URL('/', request.url));
         }
+        
     }
 
     return NextResponse.next();
@@ -48,9 +53,9 @@ export function middleware(request: NextRequest) {
 export const config = {
     matcher: [
         '/', 
-        '/dashboard',
-        '/reservation',
-        '/profile',
-        '/admin'
+        '/dashboard/:path*',
+        '/reservation/:path*',
+        '/profile/:path*',
+        '/admin/:path*',
     ], 
 };
