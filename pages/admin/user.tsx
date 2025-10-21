@@ -24,8 +24,11 @@ import {
   FaUserTimes,
   FaUserLock,
 } from "react-icons/fa";
+import Cookies from 'js-cookie';
+import { toast } from "react-toastify";
 
 export default function Page() {
+  const [userActive, setUser] = useState({ first_name: '', last_name: '', email: '', phone_number: '', id: '' });
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -68,11 +71,19 @@ export default function Page() {
   };
 
   useEffect(() => {
+    const userCookie = Cookies.get('user');
+    if (userCookie) {
+      setUser(JSON.parse(userCookie));
+    }
     refreshUsers();
   }, []);
 
   // Actions API
   const toggleUserStatus = async (userId: number, isActive: boolean) => {
+    if(userActive.id === userId.toString()) {
+      toast.error("Vous ne pouvez pas activer ou désactiver votre propre compte.");
+      return;
+    }
     try {
       const response = await fetch(
         `${process.env.backendAPI}/api/admin/toggleUserStatus/${userId}`,
@@ -96,6 +107,10 @@ export default function Page() {
 
   const lockUnlockUser = async (userId: number, isLocked: boolean) => {
     try {
+      if(userActive.id === userId.toString()) {
+        toast.error("Vous ne pouvez pas bloquer ou débloquer votre propre compte.");
+        return;
+      }
       const response = await fetch(`${process.env.backendAPI}/api/admin/lockUnlockUser`, {
         method: "POST",
         credentials: "include",
@@ -298,7 +313,7 @@ export default function Page() {
                         <td>{renderStatusBadge(user)}</td>
                         <td>
                           <Stack direction="horizontal" gap={2}>
-                            {!user.account_locked && !user.active && (
+                            {!user.account_locked && !user.active && userActive.id !== user.id_user && (
                               <Button
                                 size="sm"
                                 variant="outline-success"
@@ -308,7 +323,7 @@ export default function Page() {
                                 <FaUserCheck />
                               </Button>
                             )}
-                            {!user.account_locked && user.active && (
+                            {!user.account_locked && user.active && userActive.id !== user.id_user && (
                               <Button
                                 size="sm"
                                 variant="outline-warning"
@@ -318,7 +333,7 @@ export default function Page() {
                                 <FaUserSlash />
                               </Button>
                             )}
-                            {!user.account_locked ? (
+                            {!user.account_locked && userActive.id !== user.id_user && (
                               <Button
                                 size="sm"
                                 variant="outline-danger"
@@ -327,14 +342,35 @@ export default function Page() {
                               >
                                 <FaLock />
                               </Button>
-                            ) : (
+                            )}
+                            {user.account_locked && userActive.id !== user.id_user && (
                               <Button
                                 size="sm"
                                 variant="outline-success"
                                 onClick={() => lockUnlockUser(user.id_user, false)}
                                 title="Débloquer le compte"
                               >
-                                <FaUnlock />
+                                <FaLock />
+                              </Button>
+                            )}
+                            {userActive.id === user.id_user && (
+                              <Button
+                                size="sm"
+                                variant="outline-secondary"
+                                disabled
+                                title="Vous ne pouvez pas cliquer sur ce bouton"
+                              >
+                                <FaUserSlash />
+                              </Button>
+                            )}
+                            {userActive.id === user.id_user && (
+                              <Button
+                                size="sm"
+                                variant="outline-secondary"
+                                disabled
+                                title="Vous ne pouvez pas cliquer sur ce bouton"
+                              >
+                                <FaLock />
                               </Button>
                             )}
                           </Stack>
