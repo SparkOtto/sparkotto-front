@@ -19,7 +19,7 @@ export default function Sidebar() {
   const SidebarContent = () => (
     <>
       <div className="text-center mb-4">
-        <Link href="/" className="text-decoration-none text-white">
+        <Link href="/dashboard" className="text-decoration-none text-white">
           <Logo />
         </Link>
       </div>
@@ -58,7 +58,7 @@ export default function Sidebar() {
       <Navbar bg="purple" expand={false} className="mb-3 d-lg-none">
         <Container fluid>
           <Navbar.Brand>
-            <Link href="/" className="text-decoration-none text-white">
+            <Link href="/dashboard" className="text-decoration-none text-white">
               <Logo />
             </Link>
           </Navbar.Brand>

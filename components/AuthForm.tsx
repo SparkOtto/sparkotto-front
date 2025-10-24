@@ -112,7 +112,7 @@ export default function AuthForm() {
         pauseOnHover
         theme="light"
       />
-      <div className="bg-white p-5 rounded shadow m-5 authForm">
+      <div className="bg-white p-5 rounded shadow authForm">
         <Tabs defaultActiveKey="connexion" className="mb-3">
           <Tab eventKey="connexion" title={<span className="fw-bold">Connexion</span>}>
             <Form className="w-100" onSubmit={handleLogin}>
