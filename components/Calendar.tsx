@@ -189,7 +189,7 @@ const Calendar: React.FC<CalendarProps> = ({
                                                     ? '#ffc107'
                                                     : status === 'confirmed'
                                                         ? '#0d6efd'
-                                                        : '#198754',
+                                                        : '#686868',
                                                 borderRadius: 8,
                                                 zIndex: 10,
                                                 display: 'flex',
@@ -229,7 +229,7 @@ const Calendar: React.FC<CalendarProps> = ({
                                                     ? '#ffc107'
                                                     : status === 'confirmed'
                                                         ? '#0d6efd'
-                                                        : '#198754';
+                                                        : '#686868';
                                             }}
                                         >
                                             {info}
@@ -293,7 +293,7 @@ const Calendar: React.FC<CalendarProps> = ({
             <div className="mt-3 d-flex flex-wrap gap-3">
             <span className="badge bg-warning text-dark px-3 py-2 fs-6">{TRIP_STATUS_LABELS['pending']}</span>
             <span className="badge bg-primary px-3 py-2 fs-6">{TRIP_STATUS_LABELS['confirmed']}</span>
-            <span className="badge bg-success px-3 py-2 fs-6">{TRIP_STATUS_LABELS['completed']}</span>
+            <span className="badge bg-secondary px-3 py-2 fs-6">{TRIP_STATUS_LABELS['completed']}</span>
             </div>
             <style jsx>{`
             .calendar-day-box {
