@@ -87,13 +87,15 @@ export default function AuthForm() {
       });
 
       if (!response.ok) {
-        throw new Error('Registration failed');
+        const data = await response.json();
+        toast.error(data.message || 'Erreur lors de l\'inscription.');
+        return;
       }
 
       const data = await response.json();
       toast.success('Inscription réussie!');
     } catch (error) {
-      toast.error('Erreur lors de l\'inscription.');
+      toast.error(error instanceof Error ? error.message : 'Erreur lors de l\'inscription.');
     }
   };
 
