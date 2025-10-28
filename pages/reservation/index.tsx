@@ -30,6 +30,7 @@ const fetchVehicles = async (): Promise<Vehicle[]> => {
       }
     } else {
       const data = await response.json();
+      console.log(data);
       return data;
     }
   } catch (error) {
@@ -532,6 +533,9 @@ const VehicleReservationPage: React.FC = () => {
                           {vehicle.license_plate}
                         </div>
                         <div className="mb-1">
+                          <b>Conducteur:</b> {(vehicle.trips?.find((t) => t.id_trip === id_trip)?.driver.last_name)} {(vehicle.trips?.find((t) => t.id_trip === id_trip)?.driver.first_name)} 
+                        </div>        
+                        <div className="mb-1">
                           <b>Départ:</b> {new Date(start_date).toLocaleString("fr-FR")}
                         </div>
                         <div className="mb-1">
@@ -778,7 +782,7 @@ const VehicleReservationPage: React.FC = () => {
               <Button variant="purple" className="text-white" type="submit">
                 Confirmer la réservation
               </Button>
-            </Modal.Footer>
+            </Modal.Footer> 
           </Form>
         </Modal>
       </Container>

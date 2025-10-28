@@ -320,6 +320,17 @@ const VehicleAdminDashboard: React.FC = () => {
                                                                 </Button>
                                                             </>
                                                         )}
+                                                        {res.reservation_status === "confirmed" && (
+                                                            <>
+                                                                <Button
+                                                                    size="sm"
+                                                                    variant="outline-danger"
+                                                                    onClick={() => handleRefuseReservation(res)}
+                                                                >
+                                                                    <FaTimesCircle />
+                                                                </Button>
+                                                            </>
+                                                        )}
                                                     </Stack>
                                                 </td>
                                             </tr>
