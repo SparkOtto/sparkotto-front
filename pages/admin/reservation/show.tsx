@@ -28,7 +28,7 @@ import { Vehicle, Trip }  from '../../../components/Interface';
 import { TRIP_STATUS_LABELS }  from '../../../components/ReservationStatus';
 
 
-const ECO_FUELS = ["Hybride", "Electrique"];
+const ECO_FUELS = ["Hybride", "Électrique"];
 
 const fetchVehicles = async (): Promise<Vehicle[]> => {
     try {
@@ -311,6 +311,17 @@ const VehicleAdminDashboard: React.FC = () => {
                                                                 >
                                                                     <FaCheckCircle />
                                                                 </Button>
+                                                                <Button
+                                                                    size="sm"
+                                                                    variant="outline-danger"
+                                                                    onClick={() => handleRefuseReservation(res)}
+                                                                >
+                                                                    <FaTimesCircle />
+                                                                </Button>
+                                                            </>
+                                                        )}
+                                                        {res.reservation_status === "confirmed" && (
+                                                            <>
                                                                 <Button
                                                                     size="sm"
                                                                     variant="outline-danger"

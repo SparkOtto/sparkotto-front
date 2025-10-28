@@ -160,7 +160,7 @@ export default function VehicleManagement() {
     });
 
     // Count ecological vehicles
-    const ecoCount = vehicles.filter(v => ['Electrique', 'Hybride'].includes(v.fuel_type?.fuel_name)).length;
+    const ecoCount = vehicles.filter(v => ['Électrique', 'Hybride'].includes(v.fuel_type?.fuel_name)).length;
 
     return (
         <Layout>
@@ -177,7 +177,7 @@ export default function VehicleManagement() {
                                     <div className="text-uppercase text-muted small">Total véhicules</div>
                                     <div className="fs-3 fw-bold">{vehicles.length}</div>
                                 </div>
-                                <FaCar size={36} className="text-primary" />
+                                <FaCar size={36} className="text-purple" />
                             </Card.Body>
                         </Card>
                     </Col>
@@ -185,10 +185,10 @@ export default function VehicleManagement() {
                         <Card className="shadow-sm">
                             <Card.Body className="d-flex align-items-center justify-content-between">
                                 <div>
-                                    <div className="text-uppercase text-success small">Disponibles</div>
+                                    <div className="text-uppercase text-muted small">Disponibles</div>
                                     <div className="fs-3 fw-bold">{vehicles.filter(v => v.available).length}</div>
                                 </div>
-                                <FaLeaf size={36} className="text-success" />
+                                <FaCar size={36} className="text-yellow" />
                             </Card.Body>
                         </Card>
                     </Col>
@@ -196,10 +196,10 @@ export default function VehicleManagement() {
                         <Card className="shadow-sm">
                             <Card.Body className="d-flex align-items-center justify-content-between">
                                 <div>
-                                    <div className="text-uppercase text-info small">Écologiques</div>
+                                    <div className="text-uppercase text-muted small">Véhicules bas carbone</div>
                                     <div className="fs-3 fw-bold">{ecoCount}</div>
                                 </div>
-                                <FaLeaf size={36} className="text-info" />
+                                <FaLeaf size={36} className="text-success" />
                             </Card.Body>
                         </Card>
                     </Col>

@@ -10,7 +10,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { fr } from "date-fns/locale";
 
-const ECO_FUELS = ["Hybride", "Electrique"];
+const ECO_FUELS = ["Hybride", "Électrique"];
 
 const fetchVehicles = async (): Promise<Vehicle[]> => {
   try {
@@ -30,6 +30,7 @@ const fetchVehicles = async (): Promise<Vehicle[]> => {
       }
     } else {
       const data = await response.json();
+      console.log(data);
       return data;
     }
   } catch (error) {
@@ -151,7 +152,7 @@ const VehicleReservationPage: React.FC = () => {
 
   const renderEcoBadge = (vehicle: Vehicle) =>
     ECO_FUELS.includes(vehicle.fuel_type.fuel_name) ? (
-      <Badge bg="purple" className="me-2">
+      <Badge bg="success" className="me-2">
         <FaLeaf />
       </Badge>
     ) : null;
@@ -532,6 +533,9 @@ const VehicleReservationPage: React.FC = () => {
                           {vehicle.license_plate}
                         </div>
                         <div className="mb-1">
+                          <b>Conducteur:</b> {(vehicle.trips?.find((t) => t.id_trip === id_trip)?.driver.last_name)} {(vehicle.trips?.find((t) => t.id_trip === id_trip)?.driver.first_name)} 
+                        </div>        
+                        <div className="mb-1">
                           <b>Départ:</b> {new Date(start_date).toLocaleString("fr-FR")}
                         </div>
                         <div className="mb-1">
@@ -778,7 +782,7 @@ const VehicleReservationPage: React.FC = () => {
               <Button variant="purple" className="text-white" type="submit">
                 Confirmer la réservation
               </Button>
-            </Modal.Footer>
+            </Modal.Footer> 
           </Form>
         </Modal>
       </Container>

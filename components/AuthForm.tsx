@@ -87,13 +87,15 @@ export default function AuthForm() {
       });
 
       if (!response.ok) {
-        throw new Error('Registration failed');
+        const data = await response.json();
+        toast.error(data.message || 'Erreur lors de l\'inscription.');
+        return;
       }
 
       const data = await response.json();
       toast.success('Inscription réussie!');
     } catch (error) {
-      toast.error('Erreur lors de l\'inscription.');
+      toast.error(error instanceof Error ? error.message : 'Erreur lors de l\'inscription.');
     }
   };
 
@@ -112,7 +114,7 @@ export default function AuthForm() {
         pauseOnHover
         theme="light"
       />
-      <div className="bg-white p-5 rounded shadow m-5 authForm">
+      <div className="bg-white p-5 rounded shadow authForm">
         <Tabs defaultActiveKey="connexion" className="mb-3">
           <Tab eventKey="connexion" title={<span className="fw-bold">Connexion</span>}>
             <Form className="w-100" onSubmit={handleLogin}>
