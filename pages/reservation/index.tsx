@@ -10,7 +10,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { fr } from "date-fns/locale";
 
-const ECO_FUELS = ["Hybride", "Electrique"];
+const ECO_FUELS = ["Hybride", "Électrique"];
 
 const fetchVehicles = async (): Promise<Vehicle[]> => {
   try {
@@ -152,7 +152,7 @@ const VehicleReservationPage: React.FC = () => {
 
   const renderEcoBadge = (vehicle: Vehicle) =>
     ECO_FUELS.includes(vehicle.fuel_type.fuel_name) ? (
-      <Badge bg="purple" className="me-2">
+      <Badge bg="success" className="me-2">
         <FaLeaf />
       </Badge>
     ) : null;
